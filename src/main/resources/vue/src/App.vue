@@ -1,23 +1,89 @@
 <template>
+
   <div id="app">
-    <img src="./assets/logo.png">
-    <router-view/>
+
+    <div class="linkBar">
+
+
+      <router-link class="mapW" to="/mapW">World Epidemic Dynamic</router-link>
+
+      <a-divider type="vertical" />
+
+
+    </div>
+
+    <div class="linkBar">
+
+      <router-view></router-view>
+
+    </div>
+
   </div>
+
 </template>
 
 <script>
+
+import mapW from './components/mapW.vue'
+
 export default {
-  name: 'App'
+
+  name: 'App',
+
+  components: {
+
+    mapW
+
+  }
+
 }
+
 </script>
 
 <style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
+  /* #app{
+
+    display: flex;
+
+    justify-content: center;
+
+    align-items: center;
+
+    flex-direction: column;
+
+  } */
+
+  #app {
+
+    text-align: center;
+
+  }
+
+  /* .map{
+
+   color: #ccc;
+
+   font-size: 20px;
+
+   margin: 0 auto;
+
+   text-align: center;
+
+  } */
+
+  .linkBar{
+
+    margin: 50px 0;
+
+    font-size: 26px;
+
+  }
+
+  .router-link-active{
+
+    color: rgb(96, 174, 138);
+
+  }
+
 </style>
