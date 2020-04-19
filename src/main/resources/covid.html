@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <link rel="icon" href="<%= BASE_URL %>favicon.ico">
+    <title>Real-time epidemic information</title>
+
+    <style type="text/css">
+        .button {
+            font-size: medium;
+            height: max-content;
+            float: left;
+            margin-right: 15%;
+            margin-left: 15%;
+            color: white;
+        }
+
+        .oddRow {
+            width: 20%;
+            color: black;
+            text-align: center;
+            background-color: #bce2f5;
+            float: left;
+        }
+
+        .evenRow {
+            width: 20%;
+            color: wheat;
+            text-align: center;
+            background-color: null;
+            float: left;
+        }
+
+        .table {
+            table-layout: fixed;
+            border-width: 2px;
+            width: 100%;
+            height: 100%;
+            border: solid #446da9;
+            box-sizing: border-box;
+        }
+    </style>
+
+</head>
+
+<body background="background.jpg" style="background-size: cover;height:max-content;">
+    <div id="header" style="height:100px; border:solid #002060; margin: 10px;">
+        <h1 style="color: white; text-align: center;">
+            Real-time epidemic information
+        </h1>
+    </div>
+    <div id="screen" style="height:700px; padding:10px; border:solid #cfdff7; fill: #dce8fa; box-sizing: border-box;">
+        <div id="header" style="box-sizing: border-box;">
+            <div id="screen_header1" type="button" class="button" style="background-color: #ff8585;">
+                <h2 style="color:white; float: left; ">
+                    World epidemic dynamic
+                </h2>
+            </div>
+            <div id="screen_header2" type="button" class="button">
+                <h2 style="color:white; float: left;">
+                    China epidemic dynamic
+                </h2>
+            </div>
+        </div>
+        <div id="screen_body"
+            style="height: 600px; width: 100%;  border: solid #446da9; float: left;box-sizing: border-box;">
+            <div id="map"
+                style="height:597px; width: 55%; float: left; border:solid #446da9; border-width: 2px; box-sizing: border-box;">
+            </div>
+            <div id="table" style="width: 45%; float: left; box-sizing: border-box;">
+                <table
+                    style="border-width: 2px; height:50px; width: 100%; border: solid #446da9;box-sizing: border-box;">
+                    <tr>
+                        <th id="country" style="width:20%; color: white; background-color: #58b6e5;">Country</th>
+                        <th id="newConfirmed" style="width:19%; color: white; background: #f7bcaf">New Confirmed</th>
+                        <th id="totalConfirmed" style="width:20%; color: white; background: #ec5f74">Total Confirmed
+                        </th>
+                        <th id="totalDeaths" style="width:20%; color: white; background: #d8d8">Total Deaths</th>
+                        <th id="totalRec" style="width:19%; color: white; background:#8edbb8">Total Recovery</th>
+                        <th style="width:5%; color: white; background:#5b6890"></th>
+                    </tr>
+                </table>
+                <div id="content_div" style="height: 548px; overflow: auto; box-sizing: border-box;">
+                    <table id="table_content" class="table">
+
+
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="news"
+        style="margin-top:10px; box-sizing: border-box; height:120px; width: 100%; border: solid #002060; fill: #dce8fa;">
+        <div class="News">
+
+        </div>
+    </div>
+    <script>
+        var world = document.getElementById('screen_header1');
+        var china = document.getElementById('screen_header2');
+        var area = document.getElementById('country');
+        var content = document.getElementById('table_content');
+        var url = "data.json";
+        var request = new XMLHttpRequest();
+        var json;
+        var flag1 = true;
+        var flag2 = false;
+
+        window.onload = function () {
+            world_table();
+        }
+
+        world.onclick = function () {
+            if (flag1) {
+                world.style.backgroundColor = null;
+                china.style.backgroundColor = '#ff8585';
+                flag1 = false;
+                flag2 = true;
+                china_table();
+            } else {
+                world.style.backgroundColor = '#ff8585';
+                china.style.backgroundColor = null;
+                flag1 = true;
+                flag2 = false;
+                world_table();
+            }
+        }
+
+        china.onclick = function () {
+            if (flag2) {
+                world.style.backgroundColor = '#ff8585';
+                china.style.backgroundColor = null;
+                flag1 = true;
+                flag2 = false;
+                world_table();
+
+            } else {
+                world.style.backgroundColor = null;
+                china.style.backgroundColor = '#ff8585';
+                flag1 = false;
+                flag2 = true;
+                china_table();
+            }
+        }
+
+        function removeAllRows() {
+            var children = content.childNodes;
+            for (var i = children.length - 1; i >= 0; i--) {
+                content.removeChild(children[i]);
+            }
+        }
+
+        function world_table() {
+            console.log(1);
+            removeAllRows();
+            console.log(2);
+
+            area.innerHTML = 'Country';
+
+            request.open("get", url);
+            request.send(null);
+            request.onload = function () {
+                if (request.status == 200) {
+                    json = JSON.parse(request.responseText);
+                    for (var i = 0; i < json.length; i++) {
+                        console.log(area.style.width)
+                        var row = document.createElement("tr");
+                        row.style.width = '100%';
+                        var td1 = document.createElement("td1");
+                        var td2 = document.createElement("td2");
+                        var td3 = document.createElement("td3");
+                        var td4 = document.createElement("td4");
+                        var td5 = document.createElement("td5");
+                        if (i % 2 == 0) {
+                            td1.className = 'oddRow';
+                            td2.className = 'oddRow';
+                            td3.className = 'oddRow';
+                            td4.className = 'oddRow';
+                            td5.className = 'oddRow';
+                        } else {
+                            td1.className = 'evenRow';
+                            td2.className = 'evenRow';
+                            td3.className = 'evenRow';
+                            td4.className = 'evenRow';
+                            td5.className = 'evenRow';
+                        }
+                        td1.appendChild(document.createTextNode(json[i].name));
+                        td2.appendChild(document.createTextNode(json[i].confirm1));
+                        td3.appendChild(document.createTextNode(json[i].confirm2));
+                        td4.appendChild(document.createTextNode(json[i].confirm3));
+                        td5.appendChild(document.createTextNode(json[i].confirm4));
+                        row.appendChild(td1);
+                        row.appendChild(td2);
+                        row.appendChild(td3);
+                        row.appendChild(td4);
+                        row.appendChild(td5);
+                        content.append(row);
+                    }
+                }
+            }
+        }
+
+        function china_table() {
+            removeAllRows();
+            area.innerHTML = 'Province';
+
+            request.open("get", url);
+            request.send(null);
+            request.onload = function () {
+                if (request.status == 200) {
+                    json = JSON.parse(request.responseText);
+                    for (var i = 0; i < json.length; i++) {
+                        console.log(area.style.width)
+                        var row = document.createElement("tr");
+                        row.style.width = '100%';
+                        var td1 = document.createElement("td1");
+                        var td2 = document.createElement("td2");
+                        var td3 = document.createElement("td3");
+                        var td4 = document.createElement("td4");
+                        var td5 = document.createElement("td5");
+                        if (i % 2 == 0) {
+                            td1.className = 'oddRow';
+                            td2.className = 'oddRow';
+                            td3.className = 'oddRow';
+                            td4.className = 'oddRow';
+                            td5.className = 'oddRow';
+                        } else {
+                            td1.className = 'evenRow';
+                            td2.className = 'evenRow';
+                            td3.className = 'evenRow';
+                            td4.className = 'evenRow';
+                            td5.className = 'evenRow';
+                        }
+                        td1.appendChild(document.createTextNode(json[i].name));
+                        td2.appendChild(document.createTextNode(json[i].confirm1));
+                        td3.appendChild(document.createTextNode(json[i].confirm2));
+                        td4.appendChild(document.createTextNode(json[i].confirm3));
+                        td5.appendChild(document.createTextNode(json[i].confirm4));
+                        row.appendChild(td1);
+                        row.appendChild(td2);
+                        row.appendChild(td3);
+                        row.appendChild(td4);
+                        row.appendChild(td5);
+                        content.append(row);
+                    }
+                }
+            }
+        }
+    </script>
+
+
+</body>
+
+</html>
