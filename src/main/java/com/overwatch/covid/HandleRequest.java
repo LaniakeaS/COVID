@@ -44,17 +44,8 @@ public class HandleRequest extends Thread
 		String statusDescription = "OK";
 
 
-		// check method, only can be GET
-		if(!request.getMethod().equals("GET"))
-		{
-			version = "HTTP/1.1";
-			status = "400";
-			statusDescription = "Bad Request";
-		}
-
-
-		// check host, 400 if it's none
-		if(request.getHost().equals("NONE") && status.equals("200"))
+		// check if it's valid request
+		if(!request.getMethod().equals("GET") || request.getHost().equals("NONE"))
 		{
 			version = "HTTP/1.1";
 			status = "400";
@@ -121,6 +112,7 @@ public class HandleRequest extends Thread
 		// send respond to client
 		OutputStream sendingStream = clientSocket.getOutputStream();
 		sendingStream.write(buffer);
+		sendingStream.close();
 	}
 	
 	@Override
