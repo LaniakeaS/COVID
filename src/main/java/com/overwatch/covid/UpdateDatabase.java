@@ -2,9 +2,9 @@ package com.overwatch.covid;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
- 
+
 import org.springframework.stereotype.Service;
- 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,20 +14,50 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UpdateDatabase extends Thread{
-	private UpdateInterface database;
-	
-	// thread initialization
-	public UpdateDatabase(UpdateInterface db)
-	{
-		database = db;
-		// TODO
-	}
-	
-	// start thread
-	@Override
-	public void run() {
-		
+public class UpdateDatabase extends Thread {
+    private UpdateInterface database;
+
+    public static void main(String[] args)
+    {
+        UpdateDatabase ud = new UpdateDatabase();
+        ud.start();
+    }
+
+    // thread initialization
+    public UpdateDatabase(UpdateInterface db) {
+        database = db;
+        // TODO
+    }
+
+    public UpdateDatabase() {
+    }
+
+    // start thread
+    @Override
+    public void run() {
+        while(true)
+        {
+            List<String> result = new ArrayList<String>();
+            result.add(getStatisticsService());
+            result.add(getListByCountryTypeService2());
+            result.add(getTimelineService());
+            String[] para = result.toArray(new String[result.size()]);
+            //database.sendData(para);
+
+            for(String s : result)
+                System.out.println(s);
+
+            try
+            {
+                System.out.println("pending...");
+                UpdateDatabase.sleep(2000);
+                System.out.println("Done");
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
 	}
 		public static String getStatisticsService(){
 		String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
@@ -52,7 +82,7 @@ public class UpdateDatabase extends Thread{
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            System.out.println(result);
+            //System.out.println(result);
         }
         return result;
     }
@@ -121,7 +151,7 @@ public class UpdateDatabase extends Thread{
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            System.out.println(result);
+            //System.out.println(result);
             
             //global country list; demo
             /*JSONArray array = JSONArray.parseArray(result);
@@ -162,7 +192,7 @@ public class UpdateDatabase extends Thread{
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            System.out.println(result);
+            //System.out.println(result);
             
             //Array list; demo
             /*JSONArray array = JSONArray.parseArray(result);
