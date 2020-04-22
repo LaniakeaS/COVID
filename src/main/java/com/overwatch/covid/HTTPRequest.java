@@ -9,7 +9,9 @@ import java.util.List;
 
 public class HTTPRequest
 {
+	private String[] accept;
 	private String connection;
+	private String[] encoding;
 	private String header;
 	private String host;
 	private String method;
@@ -19,7 +21,11 @@ public class HTTPRequest
 	
 	public HTTPRequest(InputStream REQUEST)
 	{
+		accept = new String[1];
+		accept[0] = "NONE";
 		connection = "close";
+		encoding = new String[1];
+		encoding[0] = "NONE";
 		header = "NONE";
 		host = "NONE";
 		method = "NONE";
@@ -52,8 +58,14 @@ public class HTTPRequest
 				{
 					temp = iterator.next().split(": ");
 
-					switch (temp[0])
+					switch(temp[0])
 					{
+					case "Accept":
+						accept = temp[1].split(",");
+						break;
+					case "Accept-Encoding":
+						encoding = temp[1].split(",");
+						break;
 					case "Connection":
 						connection = temp[1];
 						break;
@@ -73,10 +85,20 @@ public class HTTPRequest
 			e.printStackTrace();
 		}
 	}
+
+	public String[] getAccept()
+	{
+		return accept;
+	}
 	
 	public String getConnection()
 	{
 		return connection;
+	}
+
+	public String[] getEncoding()
+	{
+		return encoding;
 	}
 	
 	public String getHeader()

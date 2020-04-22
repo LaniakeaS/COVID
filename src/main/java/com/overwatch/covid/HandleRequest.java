@@ -79,9 +79,6 @@ public class HandleRequest extends Thread
 		switch(status)
 		{
 		case "200":
-			String contentType = "Content-Type: application/html";
-			respond.add(contentType + "\r\n");
-			index = new File("src/main/resources" + request.getTarget());
 			break;
 		case "400":
 			index = new File("src/main/resources/400.html");
@@ -100,8 +97,18 @@ public class HandleRequest extends Thread
 
 
 		// construct respond body
-		respond.add("\r\n");
 		FileInputStream in = new FileInputStream(index);
+
+		if(index.getName().contains(".jpg"))
+		{
+			respond.add("Content-Type: image/jpeg\r\n");
+		}
+		else if(index.getName().contains(".html"))
+			respond.add("Content-Type: text/html\r\n");
+		else if(index.getName().contains(".json"))
+			respond.add("Content-Type: application/json\r\n");
+
+		respond.add("\r\n");
 		byte buffer[] = new byte[in.available()];
 		in.read(buffer);
 		in.close();
@@ -112,7 +119,6 @@ public class HandleRequest extends Thread
 		// send respond to client
 		OutputStream sendingStream = clientSocket.getOutputStream();
 		sendingStream.write(buffer);
-		sendingStream.close();
 	}
 	
 	@Override
@@ -125,9 +131,7 @@ public class HandleRequest extends Thread
 				output("Waiting for connection, port number: " + serverSocket.getLocalPort() + "...");
 				clientSocket = serverSocket.accept();
 				output("Success! Remote address: " + clientSocket.getRemoteSocketAddress());
-				request = new HTTPRequest(clientSocket.getInputStream());
-				// remove next line
-				output("\n\n" + request.getRequest() + "\n");
+				request = new HTTPRequest(clientSocket.getInputStream());output(request.getRequest());
 				respond();
 				
 				if(request.getConnection().equalsIgnoreCase("close"))
@@ -141,6 +145,8 @@ public class HandleRequest extends Thread
 				e.printStackTrace();
 				break;
 			}
+
+			System.out.println("\n");
 		}
 		
 		output("Server Shut Down.");
