@@ -45,13 +45,14 @@
     </style>
 
 </head>
-
-<body background="background.jpg" style="background-size: cover;height:max-content;">
+<!--Screen head: Head for webpage-->
+<body background="https://www.10wallpaper.com/wallpaper/1366x768/1411/Dark_Blue_Aurora-Abstract_widescreen_wallpaper_1366x768.jpg" style="background-size: cover;height:max-content;">
     <div id="header" style="height:100px; border:solid #002060; margin: 10px;">
         <h1 style="color: white; text-align: center;">
             Real-time epidemic information
         </h1>
     </div>
+    <!--2 Buttons: world or China-->
     <div id="screen" style="height:700px; padding:10px; border:solid #cfdff7; fill: #dce8fa; box-sizing: border-box;">
         <div id="header" style="box-sizing: border-box;">
             <div id="screen_header1" type="button" class="button" style="background-color: #ff8585;">
@@ -65,15 +66,20 @@
                 </h2>
             </div>
         </div>
+        <!--Screen body: left for map, right for tables-->
         <div id="screen_body"
             style="height: 600px; width: 100%;  border: solid #446da9; float: left;box-sizing: border-box;">
-            <div id="map"
-                style="height:597px; width: 55%; float: left; border:solid #446da9; border-width: 2px; box-sizing: border-box;">
+            <div id="map" style="height:597px; width: 55%; float: left; border:solid #446da9; border-width: 2px; box-sizing: border-box;">
+                <iframe id = "lzc" src="http://192.168.0.8:8080/" style="height: 100%; width: 100%; margin: 0px; padding: 0px;">
+                </iframe>
             </div>
+            <!--Table head, fixed position with solid border-->
             <div id="table" style="width: 45%; float: left; box-sizing: border-box;">
                 <table
                     style="border-width: 2px; height:50px; width: 100%; border: solid #446da9;box-sizing: border-box;">
+                    <!--5 columns: Area, new confirmed, total confirmed, total deaths and total recover-->
                     <tr>
+                        <!--"country" will change according to buttons, implemented in JS-->
                         <th id="country" style="width:20%; color: white; background-color: #58b6e5;">Country</th>
                         <th id="newConfirmed" style="width:19%; color: white; background: #f7bcaf">New Confirmed</th>
                         <th id="totalConfirmed" style="width:20%; color: white; background: #ec5f74">Total Confirmed
@@ -83,6 +89,7 @@
                         <th style="width:5%; color: white; background:#5b6890"></th>
                     </tr>
                 </table>
+                <!--Table are written by JS-->
                 <div id="content_div" style="height: 548px; overflow: auto; box-sizing: border-box;">
                     <table id="table_content" class="table">
 
@@ -92,6 +99,7 @@
             </div>
         </div>
     </div>
+    <!--News are written by JS-->
     <div id="news"
         style="margin-top:10px; box-sizing: border-box; height:120px; width: 100%; border: solid #002060; fill: #dce8fa;">
         <div class="News">
@@ -101,11 +109,18 @@
     <script>
         var world = document.getElementById('screen_header1');
         var china = document.getElementById('screen_header2');
+        var map = document.getElementById('lzc');
+
+        //The first table head, as mentioned before, Area
         var area = document.getElementById('country');
         var content = document.getElementById('table_content');
+
+        //Json file of data url
         var url = "data.json";
         var request = new XMLHttpRequest();
         var json;
+
+        //Flags about whether the button is clicked
         var flag1 = true;
         var flag2 = false;
 
@@ -113,6 +128,7 @@
             world_table();
         }
 
+        //world button
         world.onclick = function () {
             if (flag1) {
                 world.style.backgroundColor = null;
@@ -129,6 +145,7 @@
             }
         }
 
+        //Chian button
         china.onclick = function () {
             if (flag2) {
                 world.style.backgroundColor = '#ff8585';
@@ -146,6 +163,7 @@
             }
         }
 
+        //Remove all old rows when new button is clicked
         function removeAllRows() {
             var children = content.childNodes;
             for (var i = children.length - 1; i >= 0; i--) {
@@ -153,20 +171,27 @@
             }
         }
 
+        //Input world data
         function world_table() {
-            console.log(1);
+            //Remove all old rows
             removeAllRows();
-            console.log(2);
+            //这里改url
+            lzc.src = 'https://daohang.qq.com/?fr=hmpage';
 
+            //Change the first table head, as mentioned before, Area
             area.innerHTML = 'Country';
 
+            //Get Json file
             request.open("get", url);
             request.send(null);
+            //Function once request ends
             request.onload = function () {
+                //Check request status
                 if (request.status == 200) {
+                    //Split data
                     json = JSON.parse(request.responseText);
                     for (var i = 0; i < json.length; i++) {
-                        console.log(area.style.width)
+                        //Create rows and content
                         var row = document.createElement("tr");
                         row.style.width = '100%';
                         var td1 = document.createElement("td1");
@@ -174,19 +199,24 @@
                         var td3 = document.createElement("td3");
                         var td4 = document.createElement("td4");
                         var td5 = document.createElement("td5");
+                        //Assign style differently
+                        //Even rows
                         if (i % 2 == 0) {
                             td1.className = 'oddRow';
                             td2.className = 'oddRow';
                             td3.className = 'oddRow';
                             td4.className = 'oddRow';
                             td5.className = 'oddRow';
-                        } else {
+                        }
+                        //Odd rows
+                        else {
                             td1.className = 'evenRow';
                             td2.className = 'evenRow';
                             td3.className = 'evenRow';
                             td4.className = 'evenRow';
                             td5.className = 'evenRow';
                         }
+                        //Append content into tables
                         td1.appendChild(document.createTextNode(json[i].name));
                         td2.appendChild(document.createTextNode(json[i].confirm1));
                         td3.appendChild(document.createTextNode(json[i].confirm2));
@@ -205,6 +235,10 @@
 
         function china_table() {
             removeAllRows();
+            //这里改URL
+            lzc.src = 'https://www.cnblogs.com/wy120/p/10179901.html';
+
+
             area.innerHTML = 'Province';
 
             request.open("get", url);
