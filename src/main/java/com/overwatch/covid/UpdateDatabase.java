@@ -82,7 +82,7 @@ public class UpdateDatabase extends Thread {
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            //System.out.println(result);
+            System.out.println(result);
         }
         return result;
     }
@@ -105,7 +105,7 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
+        System.out.println(htmlResult);
  
        
         //get JSON statics
@@ -141,7 +141,7 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
+        System.out.println(htmlResult);
  
         //get JSON statics
         String reg= "window.getListByCountryTypeService2 = (.*?)\\}(?=catch)";
@@ -192,7 +192,7 @@ public class UpdateDatabase extends Thread {
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            //System.out.println(result);
+            System.out.println(result);
             
             //Array list; demo
             /*JSONArray array = JSONArray.parseArray(result);
