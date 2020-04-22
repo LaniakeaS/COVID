@@ -13,6 +13,7 @@ import org.bson.BsonArray;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
 
+import com.covid.DataBase.MongoDBJDBC;
 import com.covid.DataBase.UpdateDatabase;
 import com.fasterxml.jackson.databind.util.JSONPObject;
 import com.mongodb.BasicDBObject;
@@ -61,32 +62,22 @@ public final class Database implements UpdateInterface, RequestInterface
 
 
 	public static void connection() {
-		  
-		
-		    
-		    // 连接到数据库
-		 countrydb = mongoClient.getDatabase("countrydb");  
+	    //connect to mongodb
+		 countrydb = mongoClient.getDatabase("country");  
 		  System.out.println("Connect to database successfully");
 		  
-	    covid = countrydb.getCollection("covid",BsonDocument.class);
+	    covid = countrydb.getCollection("countrysituation",BsonDocument.class);
 	       System.out.println("collection covid accesses succeed ");
 			
 	}
 	
 	
-	public String getCollection() {//collection中所有数据
+	public String getCollection() {
+		//print all data in collection
 	     	
 		 connection();
 		 String all = null;
 	       try{   
-		    
-		         //检索所有文档  
-		         /** 
-		         * 1. 获取迭代器FindIterable<Document> 
-		         * 2. 获取游标MongoCursor<Document> 
-		         * 3. 通过游标遍历检索出的文档集合 
-		         * */  
-		     
 		         FindIterable<BsonDocument> findIterable = covid.find();  
 		         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
 		    while(mongoCursor.hasNext()){  
@@ -100,25 +91,10 @@ public final class Database implements UpdateInterface, RequestInterface
     }
 	
 	
-	
-    public String getChinaData() {
-    	 //获取集合中 中国的数据
-		   connection();
-		    FindIterable<BsonDocument> findIterable = covid.find(Filters.eq("name", "China"));  
-	        MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
-	     	String China = mongoCursor.next().toString();
-			System.out.print(China);
-			return China;
-	}
-	
-	
-	
 	@Override
 	public String getData()
 	{
 		// TODO
-		
-		
 		
 		return data;
 	}
@@ -132,10 +108,10 @@ public final class Database implements UpdateInterface, RequestInterface
 	}
 
 	
-	public void  storeData(String data) {
-		
-		//先将json的string转 document 再储存
-          
+	
+	
+	public static void  storeChinaData(String China) {
+	  /*     
 		String json = " {" + "'_id':'1'"+
                     " 'name' : 'england', " +
                     " 'newcases' : '10', " +
@@ -144,32 +120,53 @@ public final class Database implements UpdateInterface, RequestInterface
                     " } ";
        BsonDocument document = BsonDocument.parse(json);
        covid.insertOne(document );
-               
-     
+               */
+
+//China		
+		String data1 = 	"[{\"_id\":\"4\",\"name\":\"bbb\",\"total\":\"200\"}{\"_id\":\"5\",\"name\":\"bbb\",\"total\":\"200\"}]";
                 BsonArray bsonArray;
-                bsonArray =  BsonArray.parse(data);//把json格式的string导入这个数组
-                 List<BsonDocument> documents = new LinkedList<>();
-              //  String info;
+                bsonArray =  BsonArray.parse(data1);//把json格式的string导入这个数组
+                List<BsonDocument> documents = new LinkedList<>();
                 BsonDocument bson;
+               
                 for(BsonValue bsonValue : bsonArray){//put bson into document 
                      bson = bsonValue.asDocument();
                      documents.add(bson);
-               /*     info = String.format("%s :%s\t%s\t%s\t", bson.getString("countryname").getValue(), 
-                        bson.getString("newcases").getValue(), bson.getString("death").getValue(),
-                        bson.getString("total").getValue());
-                    System.out.println(info);
-                    */
-                  
-                 
-                    
-                    
-                }
+               }
                 exportMongo(documents);
+       
 		}
+	public static void storeWorldData(String World) {
 	
+        BsonArray bsonArray;
+        bsonArray =  BsonArray.parse(World);//把json格式的string导入这个数组
+        List<BsonDocument> documents = new LinkedList<>();
+        BsonDocument bson;
+       
+        for(BsonValue bsonValue : bsonArray){//put bson into document 
+             bson = bsonValue.asDocument();
+             documents.add(bson);
+       }
+        exportMongo(documents);
+		
+	}
+	public static void storeNews(String News) {
 	
+        BsonArray bsonArray;
+        bsonArray =  BsonArray.parse(News);//把json格式的string导入这个数组
+        List<BsonDocument> documents = new LinkedList<>();
+        BsonDocument bson;
+       
+        for(BsonValue bsonValue : bsonArray){//put bson into document 
+             bson = bsonValue.asDocument();
+             documents.add(bson);
+       }
+        exportMongo(documents);
+	}
 	
-	
+	//UpdateDatabase
+		
+				 //数组合并
 		
 	 private static void exportMongo( List<BsonDocument>documents){       
 	    
@@ -180,4 +177,17 @@ public final class Database implements UpdateInterface, RequestInterface
 	        mongoClient.close();
 	 }
 	
+	 
+		
+	/*	public static void main(String[] args) {
+			// TODO Auto-generated method stub
+	          
+			Database mongo = new Database();
+			
+	          mongo.getCollection();
+	     
+		      
+		}
+	 */
+	 
 }
