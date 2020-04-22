@@ -2,7 +2,6 @@ package com.overwatch.covid;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
-import com.common.apiV2.beans.HttpPojo;
  
 import org.springframework.stereotype.Service;
  
