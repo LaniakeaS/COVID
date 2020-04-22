@@ -151,7 +151,7 @@ public class UpdateDatabase extends Thread {
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            //System.out.println(result);
+            System.out.println(result);
             
             //global country list; demo
             /*JSONArray array = JSONArray.parseArray(result);
@@ -182,7 +182,7 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
+        System.out.println(htmlResult);
  
         //get JSON statics
         String reg= "window.getTimelineService = (.*?)\\}(?=catch)";
@@ -276,9 +276,7 @@ public class UpdateDatabase extends Thread {
             conn.setRequestProperty("Origin", httpPojo.getHttpOrigin()); //fake IP domain name
             conn.connect();
             Map<String, List<String>> map = conn.getHeaderFields();
-            for (String s : map.keySet()) {
-                //System.out.println(s + "-->" + map.get(s));
-            }
+            for (String s : map.keySet()) { }
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
             String line;
             while ((line = in.readLine()) != null) {
