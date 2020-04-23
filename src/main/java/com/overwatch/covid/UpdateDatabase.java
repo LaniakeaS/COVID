@@ -263,7 +263,6 @@ public class UpdateDatabase extends Thread {
             
             //fake IP access
             String ip = randIP();
-            System.out.println("current fake ip："+ip);
             conn.setRequestProperty("X-Forwarded-For", ip);
             conn.setRequestProperty("HTTP_X_FORWARDED_FOR", ip);
             conn.setRequestProperty("HTTP_CLIENT_IP", ip);

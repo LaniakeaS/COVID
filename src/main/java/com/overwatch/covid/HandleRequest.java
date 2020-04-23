@@ -17,10 +17,23 @@ public class HandleRequest extends Thread
 	private HTTPRequest request;
 
 	// to be removed
-	public static void main(String[] args)
+	public static void main(String[] args) throws InterruptedException
 	{
-		HandleRequest handle = new HandleRequest(Database.getDatabase());
+		HandleRequest handle = new HandleRequest();
 		handle.start();
+	}
+	
+	private HandleRequest()
+	{
+		try
+		{
+			InetAddress serverAddress = InetAddress.getByName("192.168.1.101");
+			serverSocket = new ServerSocket(999, 0, serverAddress);
+		}
+		catch (IOException e)
+		{
+			e.printStackTrace();
+		}
 	}
 
 	public HandleRequest(RequestInterface db)
@@ -100,9 +113,7 @@ public class HandleRequest extends Thread
 		FileInputStream in = new FileInputStream(index);
 
 		if(index.getName().contains(".jpg"))
-		{
 			respond.add("Content-Type: image/jpeg\r\n");
-		}
 		else if(index.getName().contains(".html"))
 			respond.add("Content-Type: text/html\r\n");
 		else if(index.getName().contains(".json"))
@@ -119,6 +130,7 @@ public class HandleRequest extends Thread
 		// send respond to client
 		OutputStream sendingStream = clientSocket.getOutputStream();
 		sendingStream.write(buffer);
+		sendingStream.flush();
 	}
 	
 	@Override
