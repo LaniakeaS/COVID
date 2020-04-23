@@ -72,7 +72,7 @@ public final class Database implements UpdateInterface, RequestInterface {
 	              aaa.add(all);
 			}  
 			 ChinaData = aaa.toString();
-		    System.out.println(a);
+		    
 		}catch(Exception e){
 			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
 		}
