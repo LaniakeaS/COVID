@@ -28,7 +28,7 @@ public class HandleRequest extends Thread
 		try
 		{
 			InetAddress serverAddress = InetAddress.getByName("192.168.1.101");
-			serverSocket = new ServerSocket(999, 0, serverAddress);
+			serverSocket = new ServerSocket(80, 0, serverAddress);
 		}
 		catch (IOException e)
 		{
