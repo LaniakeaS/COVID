@@ -37,7 +37,9 @@ import org.jsoup.Jsoup;
 public final class Database implements UpdateInterface, RequestInterface
 {
 	
-	private static MongoCollection<BsonDocument> covid;
+	private static MongoCollection<BsonDocument> China;
+	private static MongoCollection<BsonDocument> World;
+	private static MongoCollection<BsonDocument> News;
 	private static Database myself;
 	private String data;
 	static MongoDatabase countrydb;
@@ -59,38 +61,6 @@ public final class Database implements UpdateInterface, RequestInterface
 		return myself;
 		// DONE
 	}
-
-
-	public static void connection() {
-	    //connect to mongodb
-		 countrydb = mongoClient.getDatabase("country");  
-		  System.out.println("Connect to database successfully");
-		  
-	    covid = countrydb.getCollection("countrysituation",BsonDocument.class);
-	       System.out.println("collection covid accesses succeed ");
-			
-	}
-	
-	
-	public String getCollection() {
-		//print all data in collection
-	     	
-		 connection();
-		 String all = null;
-	       try{   
-		         FindIterable<BsonDocument> findIterable = covid.find();  
-		         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
-		    while(mongoCursor.hasNext()){  
-	            all = mongoCursor.next().toString();
-	            System.out.println(all);  
-	         }  
-	       }catch(Exception e){
-		        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		     }
-	       return all;
-    }
-	
-	
 	@Override
 	public String getData()
 	{
@@ -106,6 +76,39 @@ public final class Database implements UpdateInterface, RequestInterface
 		// TODO
 		this.data = data;
 	}
+
+
+	public static void connectionChina() {
+	    //connect to mongodb
+		 countrydb = mongoClient.getDatabase("country");  
+		  System.out.println("Connect to database successfully");
+		  
+	    China = countrydb.getCollection("countrysituation",BsonDocument.class);//改名字
+	       System.out.println("collection covid accesses succeed ");
+			
+	}
+	
+	
+	
+	public String getCollectionChina() {
+		//print all data in collection
+	     	
+		 connectionChina();
+		 String all = null;
+	       try{   
+		         FindIterable<BsonDocument> findIterable = China.find();  
+		         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+		    while(mongoCursor.hasNext()){  
+	            all = mongoCursor.next().toString();
+	            System.out.println(all);  
+	         }  
+	       }catch(Exception e){
+		        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		     }
+	       return all;
+    }
+	
+	
 
 	
 	
@@ -133,9 +136,49 @@ public final class Database implements UpdateInterface, RequestInterface
                      bson = bsonValue.asDocument();
                      documents.add(bson);
                }
-                exportMongo(documents);
+                exportMongoChina(documents);
        
 		}
+	
+	 private static void exportMongoChina( List<BsonDocument>documents){       
+		    
+	        connectionChina();
+	       
+	        China.insertMany(documents);
+	        System.out.println("\n数据导出MongoDB成功!");
+	        mongoClient.close();
+	 }
+
+	
+	 public static void connectionWorld() {
+		    //connect to mongodb
+			 countrydb = mongoClient.getDatabase("country");  
+			  System.out.println("Connect to database successfully");
+			  
+		    World = countrydb.getCollection("countrysituation",BsonDocument.class);//改名字
+		       System.out.println("collection covid accesses succeed ");
+				
+		}
+	 
+	 public String getCollectionWorld() {
+			//print all data in collection
+		     	
+			 connectionWorld();
+			 String all = null;
+		       try{   
+			         FindIterable<BsonDocument> findIterable = China.find();  
+			         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+			    while(mongoCursor.hasNext()){  
+		            all = mongoCursor.next().toString();
+		            System.out.println(all);  
+		         }  
+		       }catch(Exception e){
+			        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			     }
+		       return all;
+	    }
+	 
+ 
 	public static void storeWorldData(String World) {
 	
         BsonArray bsonArray;
@@ -147,9 +190,51 @@ public final class Database implements UpdateInterface, RequestInterface
              bson = bsonValue.asDocument();
              documents.add(bson);
        }
-        exportMongo(documents);
+        exportMongoWorld(documents);
 		
 	}
+
+	 private static void exportMongoWorld( List<BsonDocument>documents){       
+		    
+	        connectionWorld();
+	       
+	        China.insertMany(documents);
+	        System.out.println("\n数据导入MongoDB成功!");
+	        mongoClient.close();
+	 }
+
+	
+	
+	 public static void connectionNews() {
+		    //connect to mongodb
+			 countrydb = mongoClient.getDatabase("country");  
+			  System.out.println("Connect to database successfully");
+			  
+		    News = countrydb.getCollection("countrysituation",BsonDocument.class);//改名字
+		       System.out.println("collection covid accesses succeed ");
+				
+		}
+	 
+	 public String getCollectionNews() {
+			//print all data in collection
+		     	
+			 connectionNews();
+			 String all = null;
+		       try{   
+			         FindIterable<BsonDocument> findIterable = China.find();  
+			         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+			    while(mongoCursor.hasNext()){  
+		            all = mongoCursor.next().toString();
+		            System.out.println(all);  
+		         }  
+		       }catch(Exception e){
+			        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+			     }
+		       return all;
+	    }
+	 
+	 
+	 
 	public static void storeNews(String News) {
 	
         BsonArray bsonArray;
@@ -161,21 +246,23 @@ public final class Database implements UpdateInterface, RequestInterface
              bson = bsonValue.asDocument();
              documents.add(bson);
        }
-        exportMongo(documents);
+        exportMongoNews(documents);
 	}
 	
 	//UpdateDatabase
 		
 				 //数组合并
 		
-	 private static void exportMongo( List<BsonDocument>documents){       
+	 private static void exportMongoNews( List<BsonDocument>documents){       
 	    
-	        connection();
+	        connectionNews();
 	       
-	        covid.insertMany(documents);
+	        News.insertMany(documents);
 	        System.out.println("\n数据导出MongoDB成功!");
 	        mongoClient.close();
 	 }
+
+	
 	
 	 
 		
