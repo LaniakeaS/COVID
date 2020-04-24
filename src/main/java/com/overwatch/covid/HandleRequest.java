@@ -10,15 +10,6 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
 
-/* import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping; */
-
-/* @SpringBootApplication
-@Controller
-@EnableAutoConfiguration */
 public class HandleRequest extends Thread
 {
 	private ServerSocket serverSocket;
@@ -145,14 +136,14 @@ public class HandleRequest extends Thread
 	@Override
 	public void run()
 	{
-		/* while(true)
+		while(true)
 		{
 			try
 			{
 				output("Waiting for connection, port number: " + serverSocket.getLocalPort() + "...");
 				clientSocket = serverSocket.accept();
 				output("Success! Remote address: " + clientSocket.getRemoteSocketAddress());
-				request = new HTTPRequest(clientSocket.getInputStream());output(request.getRequest());
+				request = new HTTPRequest(clientSocket.getInputStream());
 				respond();
 				
 				if(request.getConnection().equalsIgnoreCase("close"))
@@ -170,20 +161,12 @@ public class HandleRequest extends Thread
 			System.out.println("\n");
 		}
 		
-		output("Server Shut Down."); */
-
-		/* SpringApplication.run(CovidApplication.class); */
+		output("Server Shut Down.");
 	}
 	
 	public static void output(String message)
 	{
 		System.out.println("HandleRequest: " + message);
 	}
-
-	/* @GetMapping("/covid")
-	public String html()
-	{
-		return "covid";
-	} */
 	
 }

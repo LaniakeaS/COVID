@@ -1,5 +1,6 @@
 package com.overwatch.covid;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -29,13 +30,6 @@ public final class Database implements UpdateInterface, RequestInterface {
 	private static MongoDatabase countrydb;
 	private static MongoClient mongoClient = new MongoClient("localhost", 27017);
 
-	public static void main(String[] args) {
-		Database.createDabatase();
-		UpdateInterface mongo = Database.getDatabase();
-		String[] data = { "a", "b", "c" };
-		mongo.sendData(data);
-	}
-
 	private Database() {
 		// DONE
 	}
@@ -51,45 +45,47 @@ public final class Database implements UpdateInterface, RequestInterface {
 	}
 
 	public static void connectionChina() {
-	    //connect to mongodb
-		countrydb = mongoClient.getDatabase("country");  
+		// connect to mongodb
+		countrydb = mongoClient.getDatabase("country");
 		System.out.println("Connect to database successfully");
-	    China = countrydb.getCollection("china",BsonDocument.class);//改名字
-	    System.out.println("collection china  accesses succeed ");
+		China = countrydb.getCollection("china", BsonDocument.class);// 改名字
+		System.out.println("collection china  accesses succeed ");
 	}
-	
-	public String getCollectionChina() {
-		//print all data in collection
-		 connectionChina();
-		 String ChinaData = null;
-         List<String> aaa = new ArrayList<String>();
-		try{   
-			FindIterable<BsonDocument> findIterable = China.find();  
-			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
 
-			while(mongoCursor.hasNext()){  
-				  String all = mongoCursor.next().toString();
-	              aaa.add(all);
-			}  
-			 ChinaData = aaa.toString();
-		    
-		}catch(Exception e){
-			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+	public String getCollectionChina() {
+		// print all data in collection
+		connectionChina();
+		String ChinaData = null;
+		List<String> aaa = new ArrayList<String>();
+		try {
+			FindIterable<BsonDocument> findIterable = China.find();
+			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+
+			while (mongoCursor.hasNext()) {
+				String all = mongoCursor.next().toString();
+				aaa.add(all);
+			}
+			ChinaData = aaa.toString();
+
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 		}
-          mongoClient.close();
 		return ChinaData;
-    }
+	}
 
 	private static void storeChinaData(String data) {
-		//String data1 = "[{\"_id\":\"4\",\"name\":\"bbb\",\"total\":\"200\"}{\"_id\":\"5\",\"name\":\"bbb\",\"total\":\"200\"}]";
-		
+		/*
+		 * data =
+		 * "[{\"_id\":\"4\",\"name\":\"bbb\",\"total\":\"200\"}{\"_id\":\"5\",\"name\":\"bbb\",\"total\":\"200\"}]";
+		 */
+
 		connectionChina();
-		  FindIterable<BsonDocument> findIterable = China.find();  
-	         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
-	         while(mongoCursor.hasNext()){  
-	            China.deleteOne(mongoCursor.next());
-	         } 
-		
+		FindIterable<BsonDocument> findIterable = China.find();
+		MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+		while (mongoCursor.hasNext()) {
+			China.deleteOne(mongoCursor.next());
+		}
+
 		BsonArray bsonArray;
 		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
 		List<BsonDocument> documents = new LinkedList<>();
@@ -103,48 +99,47 @@ public final class Database implements UpdateInterface, RequestInterface {
 	}
 
 	private static void exportMongoChina(List<BsonDocument> documents) {
-		
+
 		China.insertMany(documents);
 		System.out.println("\n数据导入MongoDB成功!");
-		mongoClient.close();
 	}
 
 	public static void connectionWorld() {
-		//connect to mongodb
-		countrydb = mongoClient.getDatabase("country");  
+		// connect to mongodb
+		countrydb = mongoClient.getDatabase("country");
 		System.out.println("Connect to database successfully");
-		World = countrydb.getCollection("world",BsonDocument.class);//改名字
+		World = countrydb.getCollection("world", BsonDocument.class);
 		System.out.println("collection world accesses succeed ");
 	}
- 
- 	public String getCollectionWorld() {
+
+	public String getCollectionWorld() {
 		// print all data in collection
 		connectionWorld();
-		List <String> bbb = new ArrayList<String>();
+		List<String> bbb = new ArrayList<String>();
 		String WorldData = null;
 
 		try {
 			FindIterable<BsonDocument> findIterable = World.find();
 			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
 			while (mongoCursor.hasNext()) {
-			String all = mongoCursor.next().toString();
+				String all = mongoCursor.next().toString();
 				bbb.add(all);
 			}
-			WorldData = bbb.toString()
+			WorldData = bbb.toString();
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 		}
-         mongoClient.close();
 		return WorldData;
 	}
 
 	public static void storeWorldData(String data) {
+		/* data = "[{\"_id\":\"4\",\"name\":\"bbb\",\"total\":\"200\"}{\"_id\":\"5\",\"name\":\"bbb\",\"total\":\"200\"}]"; */
 		connectionWorld();
-		  FindIterable<BsonDocument> findIterable = World.find();  
-	         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
-	         while(mongoCursor.hasNext()){  
-	            World.deleteOne(mongoCursor.next());
-	         } 
+		FindIterable<BsonDocument> findIterable = World.find();
+		MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+		while (mongoCursor.hasNext()) {
+			World.deleteOne(mongoCursor.next());
+		}
 		BsonArray bsonArray;
 		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
 		List<BsonDocument> documents = new LinkedList<>();
@@ -157,10 +152,9 @@ public final class Database implements UpdateInterface, RequestInterface {
 	}
 
 	private static void exportMongoWorld(List<BsonDocument> documents) {
-		
+
 		World.insertMany(documents);
 		System.out.println("\n数据导入MongoDB成功!");
-		mongoClient.close();
 	}
 
 	public static void connectionNews() {
@@ -185,21 +179,20 @@ public final class Database implements UpdateInterface, RequestInterface {
 				String all = mongoCursor.next().toString();
 				ccc.add(all);
 			}
-			NewsData=ccc.toString();
+			NewsData = ccc.toString();
 		} catch (Exception e) {
 			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 		}
-           mongoClient.close();
 		return NewsData;
 	}
 
 	public static void storeNews(String data) {
 		connectionNews();
-		  FindIterable<BsonDocument> findIterable = News.find();  
-	         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
-	         while(mongoCursor.hasNext()){  
-	            News.deleteOne(mongoCursor.next());
-	         } 
+		FindIterable<BsonDocument> findIterable = News.find();
+		MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+		while (mongoCursor.hasNext()) {
+			News.deleteOne(mongoCursor.next());
+		}
 		BsonArray bsonArray;
 		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
 		List<BsonDocument> documents = new LinkedList<>();
@@ -214,10 +207,9 @@ public final class Database implements UpdateInterface, RequestInterface {
 	}
 
 	private static void exportMongoNews(List<BsonDocument> documents) {
-		
+
 		News.insertMany(documents);
 		System.out.println("\n数据导出MongoDB成功!");
-		mongoClient.close();
 	}
 
 	@Override
