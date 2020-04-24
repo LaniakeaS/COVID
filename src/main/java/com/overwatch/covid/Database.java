@@ -1,32 +1,17 @@
-
 package com.overwatch.covid;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.bson.Document;
 import org.bson.BsonArray;
 import org.bson.BsonDocument;
 import org.bson.BsonValue;
 
-import com.covid.DataBase.MongoDBJDBC;
-import com.covid.DataBase.UpdateDatabase;
-import com.fasterxml.jackson.databind.util.JSONPObject;
-import com.mongodb.BasicDBObject;
-import com.mongodb.DB;
-import com.mongodb.DBCollection;
-import com.mongodb.DBObject;
 import com.mongodb.MongoClient;
 import com.mongodb.client.FindIterable;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoCursor;
 import com.mongodb.client.MongoDatabase;
-import com.mongodb.client.model.Filters;
-import org.jsoup.Jsoup;
 
 /*
  *  all methods in this class should be declared in static
@@ -34,160 +19,228 @@ import org.jsoup.Jsoup;
  *  'TODO' means you should add your own code in it
  */
 
-public final class Database implements UpdateInterface, RequestInterface
-{
-	
-	private static MongoCollection<BsonDocument> covid;
+public final class Database implements UpdateInterface, RequestInterface {
+
+	private static MongoCollection<BsonDocument> China;
+	private static MongoCollection<BsonDocument> World;
+	private static MongoCollection<BsonDocument> News;
 	private static Database myself;
-	private String data;
-	static MongoDatabase countrydb;
-	static MongoClient mongoClient = new MongoClient( "localhost" , 27017 );
-	
-	private Database()
-	{
-		// TODO
+	private volatile static String[] data;
+	private static MongoDatabase countrydb;
+	private static MongoClient mongoClient = new MongoClient("localhost", 27017);
+
+	public static void main(String[] args) {
+		Database.createDabatase();
+		UpdateInterface mongo = Database.getDatabase();
+		String[] data = { "a", "b", "c" };
+		mongo.sendData(data);
 	}
-	
-	public static void createDabatase()
-	{
+
+	private Database() {
+		// DONE
+	}
+
+	public static void createDabatase() {
 		myself = new Database();
 		// DONE
 	}
-	
-	public static Database getDatabase()
-	{
+
+	public static Database getDatabase() {
 		return myself;
 		// DONE
 	}
 
-
-	public static void connection() {
+	public static void connectionChina() {
 	    //connect to mongodb
-		 countrydb = mongoClient.getDatabase("country");  
-		  System.out.println("Connect to database successfully");
-		  
-	    covid = countrydb.getCollection("countrysituation",BsonDocument.class);
-	       System.out.println("collection covid accesses succeed ");
-			
+		countrydb = mongoClient.getDatabase("country");  
+		System.out.println("Connect to database successfully");
+	    China = countrydb.getCollection("china",BsonDocument.class);//改名字
+	    System.out.println("collection china  accesses succeed ");
 	}
 	
-	
-	public String getCollection() {
+	public String getCollectionChina() {
 		//print all data in collection
-	     	
-		 connection();
-		 String all = null;
-	       try{   
-		         FindIterable<BsonDocument> findIterable = covid.find();  
-		         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
-		    while(mongoCursor.hasNext()){  
-	            all = mongoCursor.next().toString();
-	            System.out.println(all);  
-	         }  
-	       }catch(Exception e){
-		        System.err.println( e.getClass().getName() + ": " + e.getMessage() );
-		     }
-	       return all;
+		 connectionChina();
+		 String ChinaData = null;
+         List<String> aaa = new ArrayList<String>();
+		try{   
+			FindIterable<BsonDocument> findIterable = China.find();  
+			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+
+			while(mongoCursor.hasNext()){  
+				  String all = mongoCursor.next().toString();
+	              aaa.add(all);
+			}  
+			 ChinaData = aaa.toString();
+		    
+		}catch(Exception e){
+			System.err.println( e.getClass().getName() + ": " + e.getMessage() );
+		}
+          mongoClient.close();
+		return ChinaData;
     }
-	
-	
-	@Override
-	public String getData()
-	{
-		// TODO
+
+	private static void storeChinaData(String data) {
+		//String data1 = "[{\"_id\":\"4\",\"name\":\"bbb\",\"total\":\"200\"}{\"_id\":\"5\",\"name\":\"bbb\",\"total\":\"200\"}]";
 		
-		return data;
-	}
+		connectionChina();
+		  FindIterable<BsonDocument> findIterable = China.find();  
+	         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+	         while(mongoCursor.hasNext()){  
+	            China.deleteOne(mongoCursor.next());
+	         } 
+		
+		BsonArray bsonArray;
+		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
+		List<BsonDocument> documents = new LinkedList<>();
+		BsonDocument bson;
 
-	
-	@Override
-	public void sendData(String data)
-	{
-		// TODO
-		this.data = data;
-	}
-
-	
-	
-	
-	public static void  storeChinaData(String China) {
-	  /*     
-		String json = " {" + "'_id':'1'"+
-                    " 'name' : 'england', " +
-                    " 'newcases' : '10', " +
-                    " 'death' : '100', " +
-                    " 'total' : '200' " +
-                    " } ";
-       BsonDocument document = BsonDocument.parse(json);
-       covid.insertOne(document );
-               */
-
-//China		
-		String data1 = 	"[{\"_id\":\"4\",\"name\":\"bbb\",\"total\":\"200\"}{\"_id\":\"5\",\"name\":\"bbb\",\"total\":\"200\"}]";
-                BsonArray bsonArray;
-                bsonArray =  BsonArray.parse(data1);//把json格式的string导入这个数组
-                List<BsonDocument> documents = new LinkedList<>();
-                BsonDocument bson;
-               
-                for(BsonValue bsonValue : bsonArray){//put bson into document 
-                     bson = bsonValue.asDocument();
-                     documents.add(bson);
-               }
-                exportMongo(documents);
-       
+		for (BsonValue bsonValue : bsonArray) {// put bson into document
+			bson = bsonValue.asDocument();
+			documents.add(bson);
 		}
-	public static void storeWorldData(String World) {
-	
-        BsonArray bsonArray;
-        bsonArray =  BsonArray.parse(World);//把json格式的string导入这个数组
-        List<BsonDocument> documents = new LinkedList<>();
-        BsonDocument bson;
-       
-        for(BsonValue bsonValue : bsonArray){//put bson into document 
-             bson = bsonValue.asDocument();
-             documents.add(bson);
-       }
-        exportMongo(documents);
-		
+		exportMongoChina(documents);
 	}
-	public static void storeNews(String News) {
-	
-        BsonArray bsonArray;
-        bsonArray =  BsonArray.parse(News);//把json格式的string导入这个数组
-        List<BsonDocument> documents = new LinkedList<>();
-        BsonDocument bson;
-       
-        for(BsonValue bsonValue : bsonArray){//put bson into document 
-             bson = bsonValue.asDocument();
-             documents.add(bson);
-       }
-        exportMongo(documents);
+
+	private static void exportMongoChina(List<BsonDocument> documents) {
+		
+		China.insertMany(documents);
+		System.out.println("\n数据导入MongoDB成功!");
+		mongoClient.close();
 	}
-	
-	//UpdateDatabase
-		
-				 //数组合并
-		
-	 private static void exportMongo( List<BsonDocument>documents){       
-	    
-	        connection();
-	       
-	        covid.insertMany(documents);
-	        System.out.println("\n数据导出MongoDB成功!");
-	        mongoClient.close();
-	 }
-	
-	 
-		
-	/*	public static void main(String[] args) {
-			// TODO Auto-generated method stub
-	          
-			Database mongo = new Database();
-			
-	          mongo.getCollection();
-	     
-		      
+
+	public static void connectionWorld() {
+		//connect to mongodb
+		countrydb = mongoClient.getDatabase("country");  
+		System.out.println("Connect to database successfully");
+		World = countrydb.getCollection("world",BsonDocument.class);//改名字
+		System.out.println("collection world accesses succeed ");
+	}
+ 
+ 	public String getCollectionWorld() {
+		// print all data in collection
+		connectionWorld();
+		List <String> bbb = new ArrayList<String>();
+		String WorldData = null;
+
+		try {
+			FindIterable<BsonDocument> findIterable = World.find();
+			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+			while (mongoCursor.hasNext()) {
+			String all = mongoCursor.next().toString();
+				bbb.add(all);
+			}
+			WorldData = bbb.toString()
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
 		}
-	 */
-	 
+         mongoClient.close();
+		return WorldData;
+	}
+
+	public static void storeWorldData(String data) {
+		connectionWorld();
+		  FindIterable<BsonDocument> findIterable = World.find();  
+	         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+	         while(mongoCursor.hasNext()){  
+	            World.deleteOne(mongoCursor.next());
+	         } 
+		BsonArray bsonArray;
+		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
+		List<BsonDocument> documents = new LinkedList<>();
+		BsonDocument bson;
+		for (BsonValue bsonValue : bsonArray) {// put bson into document
+			bson = bsonValue.asDocument();
+			documents.add(bson);
+		}
+		exportMongoWorld(documents);
+	}
+
+	private static void exportMongoWorld(List<BsonDocument> documents) {
+		
+		World.insertMany(documents);
+		System.out.println("\n数据导入MongoDB成功!");
+		mongoClient.close();
+	}
+
+	public static void connectionNews() {
+		// connect to mongodb
+		countrydb = mongoClient.getDatabase("country");
+		System.out.println("Connect to database successfully");
+		News = countrydb.getCollection("news", BsonDocument.class);// 改名字
+		System.out.println("collection news accesses succeed ");
+	}
+
+	public String getCollectionNews() {
+		// print all data in collection
+		connectionNews();
+		List<String> ccc = new ArrayList<String>();
+		String NewsData = null;
+
+		try {
+			FindIterable<BsonDocument> findIterable = News.find();
+			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+
+			while (mongoCursor.hasNext()) {
+				String all = mongoCursor.next().toString();
+				ccc.add(all);
+			}
+			NewsData=ccc.toString();
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+		}
+           mongoClient.close();
+		return NewsData;
+	}
+
+	public static void storeNews(String data) {
+		connectionNews();
+		  FindIterable<BsonDocument> findIterable = News.find();  
+	         MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();  
+	         while(mongoCursor.hasNext()){  
+	            News.deleteOne(mongoCursor.next());
+	         } 
+		BsonArray bsonArray;
+		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
+		List<BsonDocument> documents = new LinkedList<>();
+		BsonDocument bson;
+
+		for (BsonValue bsonValue : bsonArray) {// put bson into document
+			bson = bsonValue.asDocument();
+			documents.add(bson);
+		}
+
+		exportMongoNews(documents);
+	}
+
+	private static void exportMongoNews(List<BsonDocument> documents) {
+		
+		News.insertMany(documents);
+		System.out.println("\n数据导出MongoDB成功!");
+		mongoClient.close();
+	}
+
+	@Override
+	public String getChinaData() {
+		return getCollectionChina();
+	}
+
+	@Override
+	public String getWorldData() {
+		return getCollectionWorld();
+	}
+
+	@Override
+	public String getNews() {
+		return getCollectionNews();
+	}
+
+	@Override
+	public void sendData(String[] data) {
+		Database.data = data;
+		storeChinaData(data[0]);
+		storeWorldData(data[1]);
+		storeNews(data[2]);
+	}
+
 }
