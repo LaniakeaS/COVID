@@ -2,7 +2,7 @@
 
 	<div class="hello">
 
-		<!-- 初始化echarts 需要个有宽高的盒子 -->
+	<!-- Initialize echarts which need a box with a width and a height -->
 
 		<div ref="mapbox" class="box">
 
@@ -19,37 +19,31 @@
 	import echarts from 'echarts'
   import 'echarts-gl'
 	import 'echarts/map/js/china.js'
-
 	import jsonp from 'jsonp'
 
 
 
 	const option = {
-
-		title: {
-
+     backgroundColor: 'transparent',
+		/*title: {
 			text: 'Epidemic Map'
+		},*/
 
-		},
 		tooltip: {
-
-	    //  鼠标移入时的提示信息、
-
-	    // 类型
-
+	 //  The prompt message when the mouse moves in
+	 //type
 	    tigger: 'item',
 
-	    // b 区域名称 c 合并数值 a 系列名称
-
+	    // b: area name c: combined numerical a: series name
 	    formatter: 'Area：{b}<br />Total confirmed: {c}'
-
 	  },
 
 		series: [{
 
-			type: 'map3D', //告诉echarts 渲染地图
-
+			type: 'map3D', //Tell echarts to render the 3D map
 			map: 'china',
+
+			// shadow of map
       light: {
        main: {
            intensity: 3,
@@ -62,112 +56,75 @@
        }
    },
       groundPlane: {
-         show: true
+         show: false
       },
+
+		// Add a text label to the map that labels the coordinate axis indicator
 			label: {
-
-				show: false, //显示各个省份名称
-
+				show: false, //Show name of different provinces
 				fontSize: 8,
-
 			},
 
+			// sliding location
+			layoutCenter: ['50%', '40%'],
+      layoutSize: 650,
+
+			// Polygon pattern for map area
 			itemStyle: {
-
-				areaColor: '#fff' //区域的背景颜色
-
+				areaColor: '#fff' //The background color of the area
 			},
 
+      data: [{ name: '', value: '' }],
+
+			//Controls the highlight style when the mouse slides
 			emphasis: {
-
-				//控制鼠标滑过时的高亮样式
-
 				itemStyle: {
-
 					areaColor: '#c7fffd'
-
 				}
-
 			},
 
-			zoom: 1.2, //控制地图的大小
+      //Scale of the current view
+			zoom: 1,
 
 		}],
 
-		visualMap: [{
+		visualMap: {
 
-			type: 'piecewise',
+	    // Set to segment type
+	    type: 'piecewise',
+	    show: true,
 
-			show: true,
+	    // Sets different bits
 
-			splitNumber: 6,
+	    pieces: [
 
-			pieces: [{
+	      //Not specify Max, meaning Max is infinite
+	      { min: 10000 },
 
-					min: 10000
+	      { min: 1000, max: 9999 },
 
-				}, // 不指定 max，表示 max 为无限大（Infinity）。
+	      { min: 100, max: 999 },
 
-				{
+	      { min: 10, max: 99 },
 
-					min: 1000,
+	      { min: 1, max: 9 },
 
-					max: 9999
+	      { value: 0 }
+	    ],
 
-				},
+     // The color of the range
+	    inRange: {
+	      color: ['#fff', '#ffaa85', '#ff7b69', '#cc2929', '#8c0d0d', '#660208']
+	    },
 
-				{
-
-					min: 100,
-
-					max: 999
-
-				},
-
-				{
-
-					min: 10,
-
-					max: 99
-
-				},
-
-				{
-
-					min: 1,
-
-					max: 9
-
-				},
-
-				{
-
-					min: 0,
-
-					max: 0
-
-				}
-
-			],
-
-			//align:'right' // 默认是left
-
-			inRange: {
-
-				symbol: 'rect',
-
-				color: ['#fff', '#ffaa85', '#ff7b69', '#cc2929', '#8c0d0d', '#660208']
-
-			},
-
-			itemHeight: 10,
-
-			itemWidth: 20
-
-		}]
-
-
+     // Properties of range item
+	    itemWidth: 10,
+	    itemHeight: 10,
+	    bottom: 150,
+	    left: 100
+	  }
 	};
+
 
 	export default {
 
@@ -177,14 +134,14 @@
 
 			this.getData();
 
-			this.mychart = echarts.init(this.$refs.mapbox); //获取mapbox盒子
+			this.mychart = echarts.init(this.$refs.mapbox); //Get mapbox
 
 			this.mychart.setOption(option);
 
 		},
 
 		methods: {
-
+      // Get data from json file
 			getData() {
 
 				jsonp(
@@ -226,7 +183,7 @@
 
 
 <style scoped>
-
+  // Style of box which  contains echarts map
 	.box{
 
 		width: 1250px;

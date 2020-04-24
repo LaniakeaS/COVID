@@ -1,44 +1,19 @@
 <template>
 
   <div id="app">
-
+ // Add a link to go to a new webpage
     <div class="linkBar">
-
-
-      <router-link class="mapW" to="/mapW">World Epidemic Dynamic</router-link>
-
-      <a-divider type="vertical" />
-
-
+      <router-link class="mapW" to="/mapW">Epidemic Map</router-link>
     </div>
 
     <div class="linkBar">
 
       <router-view></router-view>
-
     </div>
 
   </div>
 
 </template>
-
-<script>
-
-import mapW from './components/mapW.vue'
-
-export default {
-
-  name: 'App',
-
-  components: {
-
-    mapW
-
-  }
-
-}
-
-</script>
 
 <style>
 
@@ -74,7 +49,7 @@ export default {
 
   .linkBar{
 
-    margin: 50px 0;
+    margin: 20px 0;
 
     font-size: 26px;
 
