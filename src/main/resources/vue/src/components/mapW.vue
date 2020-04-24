@@ -457,7 +457,7 @@ text: '全球疫情',
       map: 'world',
 
       // sliding location
-      layoutCenter: ['50%', '40%'],
+      layoutCenter: ['90%', '40%'],
       layoutSize: 650,
 
       // shadow of map

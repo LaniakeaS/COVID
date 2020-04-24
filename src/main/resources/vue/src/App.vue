@@ -1,7 +1,7 @@
 <template>
 
   <div id="app">
- // Add a link to go to a new webpage
+ 
     <div class="linkBar">
       <router-link class="mapW" to="/mapW">Epidemic Map</router-link>
     </div>
@@ -14,7 +14,7 @@
   </div>
 
 </template>
-
+  /*Add a link to go to a new webpage8*/
 <style>
 
   /* #app{

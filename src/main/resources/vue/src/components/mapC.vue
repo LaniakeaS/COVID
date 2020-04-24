@@ -66,7 +66,7 @@
 			},
 
 			// sliding location
-			layoutCenter: ['50%', '40%'],
+			layoutCenter: ['90%', '40%'],
       layoutSize: 650,
 
 			// Polygon pattern for map area
@@ -183,12 +183,13 @@
 
 
 <style scoped>
-  // Style of box which  contains echarts map
+  /*Style of box which  contains echarts map*/
+
 	.box{
 
 		width: 1250px;
 
-		height: 850px;
+		height: 800px;
 
 		margin: auto;
 
