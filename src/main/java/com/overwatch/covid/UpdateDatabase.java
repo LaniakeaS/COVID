@@ -17,20 +17,19 @@ import java.util.regex.Pattern;
 public class UpdateDatabase extends Thread {
     private UpdateInterface database;
 
-    public static void main(String[] args)
+    /* public static void main(String[] args)
     {
         UpdateDatabase ud = new UpdateDatabase();
         ud.start();
-    }
+    } */
 
     // thread initialization
     public UpdateDatabase(UpdateInterface db) {
         database = db;
-        // TODO
     }
 
-    public UpdateDatabase() {
-    }
+    /* public UpdateDatabase() {
+    } */
 
     // start thread
     @Override
@@ -49,9 +48,9 @@ public class UpdateDatabase extends Thread {
 
             try
             {
-                System.out.println("pending...");
-                UpdateDatabase.sleep(2000);
-                System.out.println("Done");
+                System.out.println("Update: pending...");
+                UpdateDatabase.sleep(1000);
+                System.out.println("Update: Done");
             }
             catch (InterruptedException e)
             {
