@@ -41,6 +41,7 @@ public class UpdateDatabase extends Thread {
             result.add("[" + getAreaStat() + "]");
             result.add("[" + getListByCountryTypeService2true() + "]");
             result.add("[" + getTimelineService1() + "]");
+            result.add("[" + getTimelineService2() + "]");
             String[] para = new String[3]; // add methods' results
 
             for(int i = 0; i < para.length; i++)
@@ -140,7 +141,7 @@ public class UpdateDatabase extends Thread {
     
     
     /**
-     * news
+     * China news
      * @return
      */
     
@@ -179,6 +180,41 @@ public class UpdateDatabase extends Thread {
  
         }
  
+        return result;
+    }
+    
+    // Get BBC news
+    
+    public static String getTimelineService2(){
+		String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
+		
+        //modify request
+        HttpPojo httpPojo = new HttpPojo();
+        httpPojo.setHttpHost("ncov.dxy.cn");
+        httpPojo.setHttpAccept("*/*");
+        httpPojo.setHttpConnection("keep-alive");
+        httpPojo.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Safari/537.36");
+        httpPojo.setHttpReferer("https://ncov.dxy.cn");
+        httpPojo.setHttpOrigin("https://ncov.dxy.cn");
+        Map paramObj = new HashMap();
+        String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
+        //System.out.println(htmlResult);
+ 
+        
+        // get JSON statics
+        String reg= "window.getTimelineService2 = (.*?)\\}(?=catch)";
+        Pattern totalPattern = Pattern.compile(reg);
+        Matcher totalMatcher = totalPattern.matcher(htmlResult);
+ 
+        String result="";
+        if (totalMatcher.find()){
+            result = totalMatcher.group(1);
+            System.out.println(result);
+            //JSONObject jsonObject = JSONObject.parseObject(result);
+            //String modifyTime = jsonObject.getString("modifyTime");
+            //System.out.println("modifyTime:" + "modifyTime);
+            
+        }
         return result;
     }
      
