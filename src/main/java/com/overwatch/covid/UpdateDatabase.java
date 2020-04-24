@@ -61,6 +61,9 @@ public class UpdateDatabase extends Thread {
             }
         }
 	}
+    
+    // Get China Statics
+    
     public static String getAreaStat(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
@@ -92,11 +95,13 @@ public class UpdateDatabase extends Thread {
             JSONObject jsonObject = JSONObject.parseObject(array.getString(0));
             String provinceName = jsonObject.getString("provinceName");
             System.out.println("provinceName："+provinceName);*/
+            
         }
  
         return result;
     }
     
+    //Get World Statics
     
     public static String getListByCountryTypeService2true(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
@@ -131,12 +136,10 @@ public class UpdateDatabase extends Thread {
         }
         return result;
     }
- 
- 
- 
- 
-/**
-     * news
+    
+    
+    /**
+     * China news
      * @return
      */
     public static String getTimelineService1(){
@@ -176,6 +179,41 @@ public class UpdateDatabase extends Thread {
  
         return result;
     }
+    
+    // Get BBC news
+    
+    public static String getTimelineService2(){
+		String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
+		
+        //modify request
+        HttpPojo httpPojo = new HttpPojo();
+        httpPojo.setHttpHost("ncov.dxy.cn");
+        httpPojo.setHttpAccept("*/*");
+        httpPojo.setHttpConnection("keep-alive");
+        httpPojo.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Safari/537.36");
+        httpPojo.setHttpReferer("https://ncov.dxy.cn");
+        httpPojo.setHttpOrigin("https://ncov.dxy.cn");
+        Map paramObj = new HashMap();
+        String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
+        //System.out.println(htmlResult);
+ 
+        
+        // get JSON statics
+        String reg= "window.getTimelineService2 = (.*?)\\}(?=catch)";
+        Pattern totalPattern = Pattern.compile(reg);
+        Matcher totalMatcher = totalPattern.matcher(htmlResult);
+ 
+        String result="";
+        if (totalMatcher.find()){
+            result = totalMatcher.group(1);
+            System.out.println(result);
+            //JSONObject jsonObject = JSONObject.parseObject(result);
+            //String modifyTime = jsonObject.getString("modifyTime");
+            //System.out.println("modifyTime:" + "modifyTime);
+            
+        }
+        return result;
+    }
      
  
     /**
@@ -185,6 +223,7 @@ public class UpdateDatabase extends Thread {
      * @param httpPojo
      * @return
      */
+    
     private static String httpSendGet(String url, Map paramObj, HttpPojo httpPojo){
         String result = "";
         String urlName = url + "?" + parseParam(paramObj);
@@ -239,6 +278,7 @@ public class UpdateDatabase extends Thread {
      * @param paramObj
      * @return
      */
+    
     public static String parseParam(Map paramObj){
         String param="";
         if (paramObj!=null&&!paramObj.isEmpty()){
@@ -255,6 +295,7 @@ public class UpdateDatabase extends Thread {
      * fake IP
      * @return
      */
+    
     public static String randIP() {
         Random random = new Random(System.currentTimeMillis());
         return (random.nextInt(255) + 1) + "." + (random.nextInt(255) + 1)
