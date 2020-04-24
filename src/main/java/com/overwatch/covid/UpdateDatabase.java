@@ -17,16 +17,16 @@ import java.util.regex.Pattern;
 public class UpdateDatabase extends Thread {
     private UpdateInterface database;
 
-    public static void main(String[] args)
+    public static void main(String[] args) throws InterruptedException
     {
-        UpdateDatabase ud = new UpdateDatabase();
+        Database.createDabatase();
+        UpdateDatabase ud = new UpdateDatabase(Database.getDatabase());
         ud.start();
     }
 
     // thread initialization
     public UpdateDatabase(UpdateInterface db) {
         database = db;
-        // TODO
     }
 
     public UpdateDatabase() {
@@ -38,20 +38,22 @@ public class UpdateDatabase extends Thread {
         while(true)
         {
             List<String> result = new ArrayList<String>();
-            result.add(getStatisticsService());
-            result.add(getListByCountryTypeService2());
-            result.add(getTimelineService());
-            String[] para = result.toArray(new String[result.size()]);
-            //database.sendData(para);
+            result.add("[" + getAreaStat() + "]");
+            result.add("[" + getListByCountryTypeService2true() + "]");
+            result.add("[" + getTimelineService1() + "]");
+            String[] para = new String[3]; // add methods' results
 
-            for(String s : result)
-                System.out.println(s);
+            for(int i = 0; i < para.length; i++)
+                para[i] = result.get(i); //start methods
+
+            //database.sendData(para);
+            System.out.println(para[1]);
 
             try
             {
-                System.out.println("pending...");
-                UpdateDatabase.sleep(2000);
-                System.out.println("Done");
+                System.out.println("Update: pending...");
+                UpdateDatabase.sleep(120000);
+                System.out.println("Update: Done");
             }
             catch (InterruptedException e)
             {
@@ -59,39 +61,9 @@ public class UpdateDatabase extends Thread {
             }
         }
 	}
-		public static String getStatisticsService(){
-		String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
-        //modify request
-        HttpPojo httpPojo = new HttpPojo();
-        httpPojo.setHttpHost("ncov.dxy.cn");
-        httpPojo.setHttpAccept("*/*");
-        httpPojo.setHttpConnection("keep-alive");
-        httpPojo.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Safari/537.36");
-        httpPojo.setHttpReferer("https://ncov.dxy.cn");
-        httpPojo.setHttpOrigin("https://ncov.dxy.cn");
-        Map paramObj = new HashMap();
-        String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
- 
-        
-        // get JSON statics
-        String reg= "window.getStatisticsService = (.*?)\\}(?=catch)";
-        Pattern totalPattern = Pattern.compile(reg);
-        Matcher totalMatcher = totalPattern.matcher(htmlResult);
- 
-        String result="";
-        if (totalMatcher.find()){
-            result = totalMatcher.group(1);
-            System.out.println(result);
-        }
-        return result;
-    }
- 
- 
-    /**
-     * get China province statics
-     * @return
-     */
+    
+    // Get China Statics
+    
     public static String getAreaStat(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
@@ -105,13 +77,14 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        System.out.println(htmlResult);
+        //System.out.println(htmlResult);
  
        
         //get JSON statics
         String reg= "window.getAreaStat = (.*?)\\}(?=catch)";
         Pattern totalPattern = Pattern.compile(reg);
         Matcher totalMatcher = totalPattern.matcher(htmlResult);
+        
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
@@ -122,13 +95,15 @@ public class UpdateDatabase extends Thread {
             JSONObject jsonObject = JSONObject.parseObject(array.getString(0));
             String provinceName = jsonObject.getString("provinceName");
             System.out.println("provinceName："+provinceName);*/
+            
         }
  
         return result;
     }
     
+    //Get World Statics
     
-    public static String getListByCountryTypeService2(){
+    public static String getListByCountryTypeService2true(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
         //modify request
@@ -141,10 +116,10 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        System.out.println(htmlResult);
+        //System.out.println(htmlResult);
  
         //get JSON statics
-        String reg= "window.getListByCountryTypeService2 = (.*?)\\}(?=catch)";
+        String reg= "window.getListByCountryTypeService2true = (.*?)\\}(?=catch)";
         Pattern totalPattern = Pattern.compile(reg);
         Matcher totalMatcher = totalPattern.matcher(htmlResult);
  
@@ -156,20 +131,20 @@ public class UpdateDatabase extends Thread {
             //global country list; demo
             /*JSONArray array = JSONArray.parseArray(result);
             JSONObject jsonObject = JSONObject.parseObject(array.getString(0));
-            String provinceName = jsonObject.getString("continents");
-            System.out.println("continents："+provinceName);*/
+            String CountryName = jsonObject.getString("continents");
+            System.out.println("continent："+CountryName);*/
+            
         }
         return result;
     }
- 
- 
- 
- 
-/**
+    
+    
+    /**
      * news
      * @return
      */
-    public static String getTimelineService(){
+    
+    public static String getTimelineService1(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
         //modify request
@@ -182,10 +157,10 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        System.out.println(htmlResult);
+        //System.out.println(htmlResult);
  
         //get JSON statics
-        String reg= "window.getTimelineService = (.*?)\\}(?=catch)";
+        String reg= "window.getTimelineService1 = (.*?)\\}(?=catch)";
         Pattern totalPattern = Pattern.compile(reg);
         Matcher totalMatcher = totalPattern.matcher(htmlResult);
         
@@ -206,43 +181,7 @@ public class UpdateDatabase extends Thread {
  
         return result;
     }
-    
-    
-    /**
-     * get news report history
-     * @return
-     */
-    
-    public static String getAllTimelineService(){
-        String url="https://file1.dxycdn.com/2020/0130/492/3393874921745912795-115.json?"+Math.round(Math.random()*100000000);
-        
-        //modify requests
-        HttpPojo httpPojo = new HttpPojo();
-        httpPojo.setHttpHost("ncov.dxy.cn");
-        httpPojo.setHttpAccept("*/*");
-        httpPojo.setHttpConnection("keep-alive");
-        httpPojo.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Safari/537.36");
-        httpPojo.setHttpReferer("https://ncov.dxy.cn/ncovh5/view/pneumonia_timeline?from=dxy&link=&share=&source=");
-        httpPojo.setHttpOrigin("https://ncov.dxy.cn");
-        Map paramObj = new HashMap();
-        String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTTP page
-        System.out.println(htmlResult);
- 
-        //Array list; demo
-        /*JSONObject resultJo = JSONObject.parseObject(htmlResult);
-        String dataStr = resultJo.getString("data");
-        JSONArray array = JSONArray.parseArray(dataStr);
-        for (int i = 0; i < 5; i++) {
-            JSONObject jsonObject = JSONObject.parseObject(array.getString(i));
-            String title = jsonObject.getString("title");
-            System.out.println("title："+title);
-        }*/
- 
- 
-        return htmlResult;
-    }
- 
- 
+     
  
     /**
      * HTTP request
@@ -251,6 +190,7 @@ public class UpdateDatabase extends Thread {
      * @param httpPojo
      * @return
      */
+    
     private static String httpSendGet(String url, Map paramObj, HttpPojo httpPojo){
         String result = "";
         String urlName = url + "?" + parseParam(paramObj);
@@ -305,6 +245,7 @@ public class UpdateDatabase extends Thread {
      * @param paramObj
      * @return
      */
+    
     public static String parseParam(Map paramObj){
         String param="";
         if (paramObj!=null&&!paramObj.isEmpty()){
@@ -321,6 +262,7 @@ public class UpdateDatabase extends Thread {
      * fake IP
      * @return
      */
+    
     public static String randIP() {
         Random random = new Random(System.currentTimeMillis());
         return (random.nextInt(255) + 1) + "." + (random.nextInt(255) + 1)
