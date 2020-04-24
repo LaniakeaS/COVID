@@ -41,7 +41,8 @@ public class UpdateDatabase extends Thread {
             result.add(getAreaStat());
             result.add(getListByCountryTypeService2true());
             result.add(getTimelineService1());
-            String[] para = new String[3];
+            result.add(getTimelineService2());
+            String[] para = new String[4];
 
             for(int i = 0; i < para.length; i++)
                 para[i] = result.get(i);

@@ -26,6 +26,7 @@ public class CovidApplication
 		File china = new File("src/main/resources/static/China.json");
 		File world = new File("src/main/resources/static/world.json");
 		File news = new File("src/main/resources/static/news.json");
+		File worldNews = new File("src/main/resources/static/worldnews.json");
 
 		try
 		{
@@ -38,6 +39,9 @@ public class CovidApplication
 			if(!news.exists())
 				news.createNewFile();
 
+			if(!worldNews.exists())
+				worldNews.createNewFile();
+
 			FileOutputStream out = new FileOutputStream(china);
 			out.write(get.getChinaData().getBytes());
 			out.close();
@@ -49,6 +53,9 @@ public class CovidApplication
 			out = new FileOutputStream(news);
 			out.write(get.getNews().getBytes());
 			out.close();
+
+			out = new FileOutputStream(worldNews);
+			out.write(get.getWorldNews().getBytes());
 		}
 		catch(IOException e)
 		{

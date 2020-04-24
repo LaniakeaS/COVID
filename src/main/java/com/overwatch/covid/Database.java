@@ -25,6 +25,7 @@ public final class Database implements UpdateInterface, RequestInterface {
 	private static MongoCollection<BsonDocument> China;
 	private static MongoCollection<BsonDocument> World;
 	private static MongoCollection<BsonDocument> News;
+	private static MongoCollection<BsonDocument> worldNews;
 	private static Database myself;
 	private volatile static String[] data;
 	private static MongoDatabase countrydb;
@@ -212,6 +213,61 @@ public final class Database implements UpdateInterface, RequestInterface {
 		System.out.println("\n数据导出MongoDB成功!");
 	}
 
+	public static void connectionWorldNews() {
+		// connect to mongodb
+		countrydb = mongoClient.getDatabase("country");
+		System.out.println("Connect to database successfully");
+		worldNews = countrydb.getCollection("worldnews", BsonDocument.class);// 改名字
+		System.out.println("collection news accesses succeed ");
+	}
+
+	public String getCollectionWorldNews() {
+		// print all data in collection
+		connectionWorldNews();
+		List<String> ccc = new ArrayList<String>();
+		String NewsData = null;
+
+		try {
+			FindIterable<BsonDocument> findIterable = worldNews.find();
+			MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+
+			while (mongoCursor.hasNext()) {
+				String all = mongoCursor.next().toString();
+				ccc.add(all);
+			}
+			NewsData = ccc.toString();
+		} catch (Exception e) {
+			System.err.println(e.getClass().getName() + ": " + e.getMessage());
+		}
+		return NewsData;
+	}
+
+	public static void storeWorldNews(String data) {
+		connectionWorldNews();
+		FindIterable<BsonDocument> findIterable = worldNews.find();
+		MongoCursor<BsonDocument> mongoCursor = findIterable.iterator();
+		while (mongoCursor.hasNext()) {
+			worldNews.deleteOne(mongoCursor.next());
+		}
+		BsonArray bsonArray;
+		bsonArray = BsonArray.parse(data);// 把json格式的string导入这个数组
+		List<BsonDocument> documents = new LinkedList<>();
+		BsonDocument bson;
+
+		for (BsonValue bsonValue : bsonArray) {// put bson into document
+			bson = bsonValue.asDocument();
+			documents.add(bson);
+		}
+
+		exportMongoWorldNews(documents);
+	}
+
+	private static void exportMongoWorldNews(List<BsonDocument> documents) {
+
+		worldNews.insertMany(documents);
+		System.out.println("\n数据导出MongoDB成功!");
+	}
+
 	@Override
 	public String getChinaData() {
 		return getCollectionChina();
@@ -233,6 +289,12 @@ public final class Database implements UpdateInterface, RequestInterface {
 		storeChinaData(data[0]);
 		storeWorldData(data[1]);
 		storeNews(data[2]);
+		storeWorldNews(data[3]);
+	}
+
+	@Override
+	public String getWorldNews() {
+		return getCollectionWorldNews();
 	}
 
 }
