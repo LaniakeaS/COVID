@@ -2,9 +2,9 @@ package com.overwatch.covid;
 
 import com.alibaba.fastjson.JSONArray;
 import com.alibaba.fastjson.JSONObject;
- 
+
 import org.springframework.stereotype.Service;
- 
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -14,54 +14,53 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class UpdateDatabase extends Thread{
-	private UpdateInterface database;
-	
-	// thread initialization
-	public UpdateDatabase(UpdateInterface db)
-	{
-		database = db;
-		// TODO
-	}
-	
-	// start thread
-	@Override
-	public void run() {
-		
-	}
-		public static String getStatisticsService(){
-		String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
-        //modify request
-        HttpPojo httpPojo = new HttpPojo();
-        httpPojo.setHttpHost("ncov.dxy.cn");
-        httpPojo.setHttpAccept("*/*");
-        httpPojo.setHttpConnection("keep-alive");
-        httpPojo.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Safari/537.36");
-        httpPojo.setHttpReferer("https://ncov.dxy.cn");
-        httpPojo.setHttpOrigin("https://ncov.dxy.cn");
-        Map paramObj = new HashMap();
-        String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
- 
-        
-        // get JSON statics
-        String reg= "window.getStatisticsService = (.*?)\\}(?=catch)";
-        Pattern totalPattern = Pattern.compile(reg);
-        Matcher totalMatcher = totalPattern.matcher(htmlResult);
- 
-        String result="";
-        if (totalMatcher.find()){
-            result = totalMatcher.group(1);
-            System.out.println(result);
-        }
-        return result;
+public class UpdateDatabase extends Thread {
+    private UpdateInterface database;
+
+    public static void main(String[] args) throws InterruptedException
+    {
+        Database.createDabatase();
+        UpdateDatabase ud = new UpdateDatabase(Database.getDatabase());
+        ud.start();
     }
- 
- 
-    /**
-     * get China province statics
-     * @return
-     */
+
+    // thread initialization
+    public UpdateDatabase(UpdateInterface db) {
+        database = db;
+    }
+
+    public UpdateDatabase() {
+    }
+
+    // start thread
+    @Override
+    public void run() {
+        while(true)
+        {
+            List<String> result = new ArrayList<String>();
+            result.add(getAreaStat());
+            result.add(getListByCountryTypeService2true());
+            result.add(getTimelineService1());
+            String[] para = new String[3];
+
+            for(int i = 0; i < para.length; i++)
+                para[i] = result.get(i);
+
+            database.sendData(para);
+            //System.out.println(para[0]);
+
+            try
+            {
+                System.out.println("Update: pending...");
+                UpdateDatabase.sleep(120000);
+                System.out.println("Update: Done");
+            }
+            catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
+        }
+	}
     public static String getAreaStat(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
@@ -82,10 +81,11 @@ public class UpdateDatabase extends Thread{
         String reg= "window.getAreaStat = (.*?)\\}(?=catch)";
         Pattern totalPattern = Pattern.compile(reg);
         Matcher totalMatcher = totalPattern.matcher(htmlResult);
+        
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            System.out.println(result);
+            //System.out.println(result);
             
             //China province list; demo
             /*JSONArray array = JSONArray.parseArray(result);
@@ -98,7 +98,7 @@ public class UpdateDatabase extends Thread{
     }
     
     
-    public static String getListByCountryTypeService2(){
+    public static String getListByCountryTypeService2true(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
         //modify request
@@ -114,20 +114,20 @@ public class UpdateDatabase extends Thread{
         //System.out.println(htmlResult);
  
         //get JSON statics
-        String reg= "window.getListByCountryTypeService2 = (.*?)\\}(?=catch)";
+        String reg= "window.getListByCountryTypeService2true = (.*?)\\}(?=catch)";
         Pattern totalPattern = Pattern.compile(reg);
         Matcher totalMatcher = totalPattern.matcher(htmlResult);
  
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            System.out.println(result);
+            //System.out.println(result);
             
             //global country list; demo
             /*JSONArray array = JSONArray.parseArray(result);
             JSONObject jsonObject = JSONObject.parseObject(array.getString(0));
-            String provinceName = jsonObject.getString("continents");
-            System.out.println("continents："+provinceName);*/
+            String CountryName = jsonObject.getString("continents");
+            System.out.println("continents："+CountryName);*/
         }
         return result;
     }
@@ -139,7 +139,7 @@ public class UpdateDatabase extends Thread{
      * news
      * @return
      */
-    public static String getTimelineService(){
+    public static String getTimelineService1(){
         String url="https://ncov.dxy.cn/ncovh5/view/pneumonia";
         
         //modify request
@@ -155,14 +155,14 @@ public class UpdateDatabase extends Thread{
         //System.out.println(htmlResult);
  
         //get JSON statics
-        String reg= "window.getTimelineService = (.*?)\\}(?=catch)";
+        String reg= "window.getTimelineService1 = (.*?)\\}(?=catch)";
         Pattern totalPattern = Pattern.compile(reg);
         Matcher totalMatcher = totalPattern.matcher(htmlResult);
         
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            System.out.println(result);
+            //System.out.println(result);
             
             //Array list; demo
             /*JSONArray array = JSONArray.parseArray(result);
@@ -176,43 +176,7 @@ public class UpdateDatabase extends Thread{
  
         return result;
     }
-    
-    
-    /**
-     * get news report history
-     * @return
-     */
-    
-    public static String getAllTimelineService(){
-        String url="https://file1.dxycdn.com/2020/0130/492/3393874921745912795-115.json?"+Math.round(Math.random()*100000000);
-        
-        //modify requests
-        HttpPojo httpPojo = new HttpPojo();
-        httpPojo.setHttpHost("ncov.dxy.cn");
-        httpPojo.setHttpAccept("*/*");
-        httpPojo.setHttpConnection("keep-alive");
-        httpPojo.setHttpUserAgent("Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.162 Safari/537.36");
-        httpPojo.setHttpReferer("https://ncov.dxy.cn/ncovh5/view/pneumonia_timeline?from=dxy&link=&share=&source=");
-        httpPojo.setHttpOrigin("https://ncov.dxy.cn");
-        Map paramObj = new HashMap();
-        String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTTP page
-        System.out.println(htmlResult);
- 
-        //Array list; demo
-        /*JSONObject resultJo = JSONObject.parseObject(htmlResult);
-        String dataStr = resultJo.getString("data");
-        JSONArray array = JSONArray.parseArray(dataStr);
-        for (int i = 0; i < 5; i++) {
-            JSONObject jsonObject = JSONObject.parseObject(array.getString(i));
-            String title = jsonObject.getString("title");
-            System.out.println("title："+title);
-        }*/
- 
- 
-        return htmlResult;
-    }
- 
- 
+     
  
     /**
      * HTTP request
@@ -246,9 +210,7 @@ public class UpdateDatabase extends Thread{
             conn.setRequestProperty("Origin", httpPojo.getHttpOrigin()); //fake IP domain name
             conn.connect();
             Map<String, List<String>> map = conn.getHeaderFields();
-            for (String s : map.keySet()) {
-                //System.out.println(s + "-->" + map.get(s));
-            }
+            for (String s : map.keySet()) { }
             in = new BufferedReader(new InputStreamReader(conn.getInputStream(), "utf-8"));
             String line;
             while ((line = in.readLine()) != null) {
