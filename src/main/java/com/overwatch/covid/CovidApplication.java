@@ -17,7 +17,7 @@ public class CovidApplication
 	public static void main(String[] args)
 	{
 		Server.startServer();
-		//SpringApplication.run(CovidApplication.class, args);
+		SpringApplication.run(CovidApplication.class, args);
 	}
 
 	@GetMapping("/covid")
