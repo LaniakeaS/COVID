@@ -17,21 +17,22 @@ public class CovidApplication extends Thread
 
 	public static void main(String[] args)
 	{
-		CovidApplication start = new CovidApplication();
-		start.start();
 		Server.startServer();
 		SpringApplication.run(CovidApplication.class, args);
+		CovidApplication start = new CovidApplication();
+		start.start();
 	}
 
 	private static void cmdVue()
 	{
 		try
 		{
+			System.out.println("Starting vue..... Please wait.");
 			StringBuffer command = new StringBuffer();
 			command.append("cmd /c dir");
 			command.append(" && cd src/main/resources/static/dist");
 			command.append(" && cnpm install -g http-server");
-			command.append(" && http-server");
+			command.append(" && http-server --port 7777");
 			Process p = Runtime.getRuntime().exec(command.toString());
 			Scanner scanner = new Scanner(p.getInputStream());
 
@@ -43,6 +44,7 @@ public class CovidApplication extends Thread
 		catch (IOException e)
 		{
 			e.printStackTrace();
+			System.out.println("Vue: Start Fail... Please reboot the process");
 			System.exit(-1);
 		}
 	}
