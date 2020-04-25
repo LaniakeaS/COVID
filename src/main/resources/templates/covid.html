@@ -42,11 +42,30 @@
             border: solid #446da9;
             box-sizing: border-box;
         }
+
+        .newsRow {
+            width: 100%;
+            color: #ec5f74;
+            font-size: xx-large;
+            background-color: null;
+            float: left;
+        }
+
+        .summary {
+            width: 100%;
+            color: whitesmoke;
+            font-size: medium;
+            background-color: null;
+            float: left;
+        }
     </style>
 
 </head>
 <!--Screen head: Head for webpage-->
-<body background="background.jpg" style="background-size: cover;height:max-content;">
+
+<body
+    background="background.jpg"
+    style="background-size: cover;height:max-content;">
     <div id="header" style="height:100px; border:solid #002060; margin: 10px;">
         <h1 style="color: white; text-align: center;">
             Real-time epidemic information
@@ -69,8 +88,10 @@
         <!--Screen body: left for map, right for tables-->
         <div id="screen_body"
             style="height: 600px; width: 100%;  border: solid #446da9; float: left;box-sizing: border-box;">
-            <div id="map" style="height:597px; width: 55%; float: left; border:solid #446da9; border-width: 2px; box-sizing: border-box;">
-                <iframe id = "lzc" src="http://192.168.0.8:8080/" style="height: 100%; width: 100%; margin: 0px; padding: 0px;">
+            <div id="map"
+                style="height:597px; width: 55%; float: left; border:solid #446da9; border-width: 2px; box-sizing: border-box;">
+                <iframe id="lzc" src="http://192.168.0.8:8080/"
+                    style="height: 100%; width: 100%; margin: 0px; padding: 0px;">
                 </iframe>
             </div>
             <!--Table head, fixed position with solid border-->
@@ -81,7 +102,8 @@
                     <tr>
                         <!--"country" will change according to buttons, implemented in JS-->
                         <th id="country" style="width:20%; color: white; background-color: #58b6e5;">Country</th>
-                        <th id="newConfirmed" style="width:19%; color: white; background: #f7bcaf">New Confirmed</th>
+                        <th id="currentConfirmed" style="width:19%; color: white; background: #f7bcaf">Current Confirmed
+                        </th>
                         <th id="totalConfirmed" style="width:20%; color: white; background: #ec5f74">Total Confirmed
                         </th>
                         <th id="totalDeaths" style="width:20%; color: white; background: #d8d8">Total Deaths</th>
@@ -91,20 +113,14 @@
                 </table>
                 <!--Table are written by JS-->
                 <div id="content_div" style="height: 548px; overflow: auto; box-sizing: border-box;">
-                    <table id="table_content" class="table">
-
-
-                    </table>
+                    <table id="table_content" class="table"></table>
                 </div>
             </div>
         </div>
     </div>
     <!--News are written by JS-->
     <div id="news"
-        style="margin-top:10px; box-sizing: border-box; height:120px; width: 100%; border: solid #002060; fill: #dce8fa;">
-        <div class="News">
-
-        </div>
+        style="margin-top:10px; box-sizing: border-box; height:120px; width: 100%; border: solid #002060; fill: #dce8fa; overflow: auto;">
     </div>
     <script>
         var world = document.getElementById('screen_header1');
@@ -114,18 +130,30 @@
         //The first table head, as mentioned before, Area
         var area = document.getElementById('country');
         var content = document.getElementById('table_content');
+        var news = document.getElementById('news');
 
         //Json file of data url
-        var url = "data.json";
+        var World_url = "world.json";
+        var China_url = "China.json";
+        var News_url = "news.json";
+        var World_News_url = "worldnews.json";
+
+        //request for table and news
         var request = new XMLHttpRequest();
+        var news_request = new XMLHttpRequest();
+
+        //Stored json file
         var json;
+        var news_json;
 
         //Flags about whether the button is clicked
         var flag1 = true;
         var flag2 = false;
 
+        //Function as the page be created
         window.onload = function () {
-            world_table();
+            News();
+            table();
         }
 
         //world button
@@ -135,13 +163,15 @@
                 china.style.backgroundColor = '#ff8585';
                 flag1 = false;
                 flag2 = true;
-                china_table();
+                News();
+                table();
             } else {
                 world.style.backgroundColor = '#ff8585';
                 china.style.backgroundColor = null;
                 flag1 = true;
                 flag2 = false;
-                world_table();
+                News();
+                table();
             }
         }
 
@@ -152,14 +182,16 @@
                 china.style.backgroundColor = null;
                 flag1 = true;
                 flag2 = false;
-                world_table();
+                News();
+                table();
 
             } else {
                 world.style.backgroundColor = null;
                 china.style.backgroundColor = '#ff8585';
                 flag1 = false;
                 flag2 = true;
-                china_table();
+                News();
+                table();
             }
         }
 
@@ -171,18 +203,30 @@
             }
         }
 
-        //Input world data
-        function world_table() {
+        function removeAllNews() {
+            var children = news.childNodes;
+            for (var i = children.length - 1; i >= 0; i--) {
+                news.removeChild(children[i]);
+            }
+        }
+
+        //Input data
+        function table() {
             //Remove all old rows
             removeAllRows();
-            //这里改url
-            lzc.src = 'https://daohang.qq.com/?fr=hmpage';
 
-            //Change the first table head, as mentioned before, Area
-            area.innerHTML = 'Country';
-
-            //Get Json file
-            request.open("get", url);
+            if (flag1) {
+                //Change to world map url
+                lzc.src = 'http://127.0.0.1:8080/#/mapW';
+                //open request
+                request.open("get", World_url);
+                //Change area name
+                area.innerHTML = 'Country';
+            } else {
+                lzc.src = 'http://127.0.0.1:8080/#/';
+                request.open("get", China_url);
+                area.innerHTML = 'Province';
+            }
             request.send(null);
             //Function once request ends
             request.onload = function () {
@@ -217,11 +261,11 @@
                             td5.className = 'evenRow';
                         }
                         //Append content into tables
-                        td1.appendChild(document.createTextNode(json[i].name));
-                        td2.appendChild(document.createTextNode(json[i].confirm1));
-                        td3.appendChild(document.createTextNode(json[i].confirm2));
-                        td4.appendChild(document.createTextNode(json[i].confirm3));
-                        td5.appendChild(document.createTextNode(json[i].confirm4));
+                        td1.appendChild(document.createTextNode(json[i].provinceName));
+                        td2.appendChild(document.createTextNode(json[i].currentConfirmedCount));
+                        td3.appendChild(document.createTextNode(json[i].confirmedCount));
+                        td4.appendChild(document.createTextNode(json[i].deadCount));
+                        td5.appendChild(document.createTextNode(json[i].curedCount));
                         row.appendChild(td1);
                         row.appendChild(td2);
                         row.appendChild(td3);
@@ -233,52 +277,36 @@
             }
         }
 
-        function china_table() {
-            removeAllRows();
-            //这里改URL
-            lzc.src = 'http://192.168.1.101:8080/';
+        function News() {
+            //Remove all news
+            removeAllNews();
+            //deal with request
+            if (flag1) {
+                news_request.open("get", World_News_url);
 
-
-            area.innerHTML = 'Province';
-
-            request.open("get", url);
-            request.send(null);
-            request.onload = function () {
-                if (request.status == 200) {
-                    json = JSON.parse(request.responseText);
-                    for (var i = 0; i < json.length; i++) {
-                        console.log(area.style.width)
-                        var row = document.createElement("tr");
-                        row.style.width = '100%';
-                        var td1 = document.createElement("td1");
-                        var td2 = document.createElement("td2");
-                        var td3 = document.createElement("td3");
-                        var td4 = document.createElement("td4");
-                        var td5 = document.createElement("td5");
-                        if (i % 2 == 0) {
-                            td1.className = 'oddRow';
-                            td2.className = 'oddRow';
-                            td3.className = 'oddRow';
-                            td4.className = 'oddRow';
-                            td5.className = 'oddRow';
-                        } else {
-                            td1.className = 'evenRow';
-                            td2.className = 'evenRow';
-                            td3.className = 'evenRow';
-                            td4.className = 'evenRow';
-                            td5.className = 'evenRow';
-                        }
-                        td1.appendChild(document.createTextNode(json[i].name));
-                        td2.appendChild(document.createTextNode(json[i].confirm1));
-                        td3.appendChild(document.createTextNode(json[i].confirm2));
-                        td4.appendChild(document.createTextNode(json[i].confirm3));
-                        td5.appendChild(document.createTextNode(json[i].confirm4));
-                        row.appendChild(td1);
-                        row.appendChild(td2);
-                        row.appendChild(td3);
-                        row.appendChild(td4);
-                        row.appendChild(td5);
-                        content.append(row);
+            } else {
+                news_request.open("get", News_url);
+            }
+            news_request.send(null);
+            news_request.onload = function () {
+                //request succeed
+                if (news_request.status == 200) {
+                    //parse json
+                    news_json = JSON.parse(news_request.responseText);
+                    for (var i = 0; i < news_json.length; i++) {
+                        //create news title
+                        var title = document.createElement('a');
+                        //append news content
+                        title.innerHTML = news_json[i].title;
+                        //append title url
+                        title.href = news_json[i].sourceUrl;
+                        title.className = 'newsRow';
+                        news.append(title);
+                        //summary of title
+                        var summary = document.createElement('p');
+                        summary.innerHTML = news_json[i].summary;
+                        summary.className = 'summary';
+                        news.append(summary);
                     }
                 }
             }

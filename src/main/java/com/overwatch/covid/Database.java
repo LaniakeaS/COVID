@@ -27,7 +27,6 @@ public final class Database implements UpdateInterface, RequestInterface {
 	private static MongoCollection<BsonDocument> News;
 	private static MongoCollection<BsonDocument> worldNews;
 	private static Database myself;
-	private volatile static String[] data;
 	private static MongoDatabase countrydb;
 	private static MongoClient mongoClient = new MongoClient("localhost", 27017);
 
@@ -285,7 +284,6 @@ public final class Database implements UpdateInterface, RequestInterface {
 
 	@Override
 	public void sendData(String[] data) {
-		Database.data = data;
 		storeChinaData(data[0]);
 		storeWorldData(data[1]);
 		storeNews(data[2]);

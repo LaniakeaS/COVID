@@ -1,10 +1,5 @@
 package com.overwatch.covid;
 
-import com.alibaba.fastjson.JSONArray;
-import com.alibaba.fastjson.JSONObject;
-
-import org.springframework.stereotype.Service;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -48,7 +43,6 @@ public class UpdateDatabase extends Thread {
                 para[i] = result.get(i);
 
             database.sendData(para);
-            //System.out.println(para[0]);
 
             try
             {
@@ -78,7 +72,6 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
  
        
         //get JSON statics
@@ -89,14 +82,6 @@ public class UpdateDatabase extends Thread {
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            //System.out.println(result);
-            
-            //China province list; demo
-            /*JSONArray array = JSONArray.parseArray(result);
-            JSONObject jsonObject = JSONObject.parseObject(array.getString(0));
-            String provinceName = jsonObject.getString("provinceName");
-            System.out.println("provinceName："+provinceName);*/
-            
         }
  
         return result;
@@ -117,7 +102,6 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
  
         //get JSON statics
         String reg= "window.getListByCountryTypeService2true = (.*?)\\}(?=catch)";
@@ -127,13 +111,6 @@ public class UpdateDatabase extends Thread {
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            //System.out.println(result);
-            
-            //global country list; demo
-            /*JSONArray array = JSONArray.parseArray(result);
-            JSONObject jsonObject = JSONObject.parseObject(array.getString(0));
-            String CountryName = jsonObject.getString("continents");
-            System.out.println("continents："+CountryName);*/
         }
         return result;
     }
@@ -156,7 +133,6 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
  
         //get JSON statics
         String reg= "window.getTimelineService1 = (.*?)\\}(?=catch)";
@@ -166,16 +142,6 @@ public class UpdateDatabase extends Thread {
         String result="";
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
-            //System.out.println(result);
-            
-            //Array list; demo
-            /*JSONArray array = JSONArray.parseArray(result);
-            for (int i = 0; i < array.size(); i++) {
-                JSONObject jsonObject = JSONObject.parseObject(array.getString(i));
-                String title = jsonObject.getString("title");
-                System.out.println("title："+title);
-            }*/
- 
         }
  
         return result;
@@ -196,7 +162,6 @@ public class UpdateDatabase extends Thread {
         httpPojo.setHttpOrigin("https://ncov.dxy.cn");
         Map paramObj = new HashMap();
         String htmlResult = httpSendGet(url, paramObj, httpPojo); //whole HTML page
-        //System.out.println(htmlResult);
  
         
         // get JSON statics
@@ -208,10 +173,6 @@ public class UpdateDatabase extends Thread {
         if (totalMatcher.find()){
             result = totalMatcher.group(1);
             System.out.println(result);
-            //JSONObject jsonObject = JSONObject.parseObject(result);
-            //String modifyTime = jsonObject.getString("modifyTime");
-            //System.out.println("modifyTime:" + "modifyTime);
-            
         }
         return result;
     }
@@ -286,7 +247,6 @@ public class UpdateDatabase extends Thread {
             for (Object key:paramObj.keySet()){
                 String value = paramObj.get(key).toString();
                 param+=(key+"="+value+"&");
- 
             }
         }
         return param;
@@ -302,8 +262,6 @@ public class UpdateDatabase extends Thread {
         return (random.nextInt(255) + 1) + "." + (random.nextInt(255) + 1)
                 + "." + (random.nextInt(255) + 1) + "."
                 + (random.nextInt(255) + 1);
- 
-			 // TODO
 		 }
 	}
 
