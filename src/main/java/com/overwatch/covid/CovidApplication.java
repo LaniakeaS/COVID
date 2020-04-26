@@ -31,6 +31,7 @@ public class CovidApplication extends Thread
 			StringBuffer command = new StringBuffer();
 			command.append("cmd /c dir");
 			command.append(" && cd src/main/resources/static/dist");
+			//command.append(" && taskkill /f /t /im node.exe");
 			command.append(" && http-server --port 7777");
 			Process p = Runtime.getRuntime().exec(command.toString());
 			Scanner scanner = new Scanner(p.getInputStream());
